@@ -12,10 +12,10 @@ export const SOLANA_RPC = (process.env.NEXT_PUBLIC_SOLANA_RPC || '').trim();
 // RPC endpoints for better reliability
 export const RPC_ENDPOINTS = {
   'mainnet-beta': [
-    'https://rpc.ankr.com/solana', // More reliable for localhost
-    'https://solana-mainnet.g.alchemy.com/v2/demo',
-    'https://api.mainnet-beta.solana.com',
-    'https://solana.public-rpc.com',
+    'https://api.mainnet-beta.solana.com', // Official Solana RPC (free)
+    'https://solana.public-rpc.com', // Public RPC
+    'https://rpc.ankr.com/solana', // Ankr (requires API key)
+    'https://solana-mainnet.g.alchemy.com/v2/demo', // Alchemy demo
   ],
   'devnet': [
     'https://api.devnet.solana.com',

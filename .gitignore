@@ -35,4 +35,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.env
+# Don't commit Supabase credentials
+# The config.ts file will be manually excluded before committing

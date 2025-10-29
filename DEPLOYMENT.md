@@ -14,13 +14,24 @@
    - Import your GitHub repository
    - Deploy automatically
 
-## Environment Variables (Optional)
+## Environment Variables (REQUIRED)
 
-If you want to use a dedicated RPC endpoint, add to Vercel:
+**You MUST set these in Vercel Dashboard > Settings > Environment Variables:**
 
 ```env
-NEXT_PUBLIC_SOLANA_RPC=https://your-rpc-endpoint.com
+NEXT_PUBLIC_SUPABASE_URL=https://bsnmdvktzbvoaotvnoed.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzbm1kdmt0emJ2b2FvdHZub2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE1NzE0MjEsImV4cCI6MjA3NzE0NzQyMX0.YrkWSB6GpDTxBKk7QyQBUexX0azSQtbzh121deaNkuk
+NEXT_PUBLIC_SOLANA_NETWORK=mainnet-beta
+NEXT_PUBLIC_SOLANA_RPC=https://rpc.ankr.com/solana
 ```
+
+**Steps:**
+1. Go to your Vercel project dashboard
+2. Click **Settings** tab
+3. Click **Environment Variables** in the sidebar
+4. Add each variable above
+5. Click **Save**
+6. **Redeploy** your project
 
 ## Why Localhost Has Issues
 

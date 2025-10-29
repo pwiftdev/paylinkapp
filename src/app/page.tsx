@@ -4,21 +4,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 import Tokenomics from './components/Tokenomics';
-import { useEffect, useRef, useState } from 'react';
 
 export default function Home() {
-  const [isVisible, setIsVisible] = useState(false);
-  const heroRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
 
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section 
-        ref={heroRef}
         className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600 flex items-center justify-center px-4 relative overflow-hidden"
       >
         {/* Animated Background Pattern */}
@@ -42,7 +34,7 @@ export default function Home() {
           ))}
         </div>
         
-        <div className={`text-center max-w-4xl mx-auto relative z-10 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+        <div className="text-center max-w-4xl mx-auto relative z-10 transition-all duration-1000 opacity-100 translate-y-0">
           <div className="mb-8 animate-bounce-slow">
             <Image
               src="/paylinklogo.png"

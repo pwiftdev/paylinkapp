@@ -17,9 +17,13 @@ export const CustomWalletProvider: FC<{ children: ReactNode }> = ({ children }) 
   const network = SOLANA_NETWORK as WalletAdapterNetwork;
   const endpoint = useMemo(() => {
     try {
-      return getPreferredRpc(network as keyof typeof RPC_ENDPOINTS);
+      const rpcEndpoint = getPreferredRpc(network as keyof typeof RPC_ENDPOINTS);
+      console.log('Using RPC endpoint:', rpcEndpoint);
+      return rpcEndpoint;
     } catch {
-      return clusterApiUrl(network);
+      const fallbackEndpoint = clusterApiUrl(network);
+      console.log('Using fallback RPC endpoint:', fallbackEndpoint);
+      return fallbackEndpoint;
     }
   }, [network]);
 

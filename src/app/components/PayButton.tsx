@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
-import { Transaction, SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js';
-import { PublicKey } from '@solana/web3.js';
+import { Transaction, SystemProgram, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import { FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
 interface PayButtonProps {
@@ -43,12 +42,33 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
         })
       );
 
-      // Get recent blockhash
-      const { blockhash } = await connection.getLatestBlockhash();
+      // Get recent blockhash (required before signing) with retry logic
+      let blockhash;
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        try {
+          const result = await connection.getLatestBlockhash();
+          blockhash = result.blockhash;
+          break;
+        } catch (rpcError) {
+          retryCount++;
+          console.error(`RPC Error getting blockhash (attempt ${retryCount}):`, rpcError);
+          
+          if (retryCount >= maxRetries) {
+            throw new Error('Unable to connect to Solana network. Please try again or check your internet connection.');
+          }
+          
+          // Wait before retry (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+        }
+      }
+      
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = publicKey;
 
-      // Sign the transaction
+      // Let the wallet handle signing (this will trigger the wallet popup)
       const signedTransaction = await signTransaction(transaction);
 
       // Send the transaction
@@ -64,12 +84,12 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
       
       // Check for specific error types and provide helpful messages
       if (err instanceof Error) {
-        if (err.message.includes('Attempt to debit an account but found no record of a prior credit')) {
+        if (err.message.includes('User rejected') || err.message.includes('User declined')) {
+          setError('Payment was cancelled. Please try again if you want to proceed.');
+        } else if (err.message.includes('Insufficient funds') || err.message.includes('insufficient')) {
           setError('Insufficient SOL balance. Please add SOL to your wallet and try again.');
         } else if (err.message.includes('Transaction simulation failed')) {
           setError('Transaction failed. Please check your wallet balance and try again.');
-        } else if (err.message.includes('User rejected')) {
-          setError('Payment was cancelled. Please try again if you want to proceed.');
         } else {
           setError(err.message);
         }
@@ -137,12 +157,6 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
               <p className="text-sm text-gray-500">
                 Click the button above to send your payment
               </p>
-              <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 font-medium mb-2">Need test SOL?</p>
-                <p className="text-xs text-blue-600">
-                  Visit <a href="https://faucet.solana.com/" target="_blank" rel="noopener noreferrer" className="underline">faucet.solana.com</a> to get free test SOL for development
-                </p>
-              </div>
             </div>
           )}
         </>

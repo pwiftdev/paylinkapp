@@ -53,10 +53,10 @@ export default function LinkPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 flex items-center justify-center">
         <div className="text-center">
           <FaSpinner className="inline-block animate-spin text-4xl text-purple-600 mb-4" />
-          <p className="text-gray-600">Loading PayLink...</p>
+          <p className="text-gray-600 font-medium text-lg">Loading PayLink...</p>
         </div>
       </main>
     );
@@ -64,12 +64,14 @@ export default function LinkPage() {
 
   if (error || !link) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 flex items-center justify-center px-4">
         <div className="text-center max-w-md">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-            <FaExclamationTriangle className="text-4xl text-red-500 mb-4 mx-auto" />
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Link Not Found</h1>
-            <p className="text-gray-600">{error || 'This PayLink does not exist'}</p>
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+            <div className="w-16 h-16 bg-gradient-to-br from-red-100 to-red-200 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <FaExclamationTriangle className="text-2xl text-red-600" />
+            </div>
+            <h1 className="text-2xl font-light text-gray-900 mb-3">Link Not Found</h1>
+            <p className="text-gray-600 text-lg">{error || 'This PayLink does not exist'}</p>
           </div>
         </div>
       </main>
@@ -77,78 +79,74 @@ export default function LinkPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-purple-50">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(147,51,234,0.05),transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_80%,rgba(59,130,246,0.05),transparent_50%)]"></div>
-      
-      <div className="relative z-10 py-12 px-4">
+    <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100">
+      <div className="py-12 px-4">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="inline-block p-4 bg-white/80 backdrop-blur-sm rounded-full shadow-lg mb-6">
+            <div className="inline-block p-6 bg-white rounded-2xl shadow-sm border border-gray-200 mb-8">
               <Image
                 src="/paylinklogo.png"
                 alt="PayLink Logo"
-                width={64}
-                height={64}
+                width={80}
+                height={80}
                 className="mx-auto"
               />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 mb-3">Payment Request</h1>
-            <div className="flex items-center justify-center gap-2 text-gray-600">
+            <h1 className="text-4xl font-light text-gray-900 mb-4">Payment Request</h1>
+            <div className="flex items-center justify-center gap-2 text-gray-600 text-lg">
               <span>Requested by</span>
-              <span className="font-semibold text-purple-600">@{link.username}</span>
+              <span className="font-medium bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">@{link.username}</span>
             </div>
           </div>
 
           {/* Main Payment Card */}
-          <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/20 p-8 mb-8">
+          <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 shadow-sm">
             {/* Amount Section */}
             <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-purple-100 to-pink-100 rounded-full mb-6 shadow-lg">
-                <FaDollarSign className="text-4xl text-purple-600" />
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-100 to-purple-200 rounded-2xl mb-6">
+                <FaDollarSign className="text-3xl text-purple-600" />
               </div>
-              <p className="text-sm font-medium text-gray-500 mb-2 uppercase tracking-wide">Amount to Pay</p>
-              <p className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
+              <p className="text-sm font-medium text-gray-500 mb-3 uppercase tracking-wide">Amount to Pay</p>
+              <p className="text-5xl font-light text-gray-900 mb-2">
                 {link.amount} SOL
               </p>
-              <p className="text-sm text-gray-400">Solana</p>
+              <p className="text-sm text-gray-500">Solana</p>
             </div>
 
             {/* Payment Details */}
             <div className="space-y-6 mb-10">
               {/* Recipient */}
-              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
-                <div className="flex items-center mb-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-                    <FaWallet className="text-blue-600 text-sm" />
+              <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-100 to-blue-200 rounded-xl flex items-center justify-center mr-4">
+                    <FaWallet className="text-blue-600 text-lg" />
                   </div>
-                  <p className="text-sm font-semibold text-gray-700">Send to</p>
+                  <p className="text-sm font-medium text-gray-700">Send to</p>
                 </div>
-                <div className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
                   <p className="text-sm font-mono text-gray-900 break-all">{link.recipient}</p>
                 </div>
               </div>
 
               {/* Message */}
               {link.message && (
-                <div className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200">
-                  <div className="flex items-center mb-3">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
-                      <FaComment className="text-purple-600 text-sm" />
+                <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl p-6 border border-purple-200">
+                  <div className="flex items-center mb-4">
+                    <div className="w-10 h-10 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mr-4">
+                      <FaComment className="text-purple-600 text-lg" />
                     </div>
-                    <p className="text-sm font-semibold text-gray-700">Payment Memo</p>
+                    <p className="text-sm font-medium text-gray-700">Payment Memo</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-purple-200">
+                  <div className="bg-white rounded-lg p-4 border border-purple-200">
                     <p className="text-gray-900">{link.message}</p>
                   </div>
                 </div>
               )}
 
               {/* Created Date */}
-              <div className="flex items-center justify-center text-xs text-gray-400 bg-gray-50 rounded-lg py-3">
-                <FaCalendarAlt className="mr-2" />
+              <div className="flex items-center justify-center text-sm text-gray-500 bg-gray-50 rounded-xl py-4">
+                <FaCalendarAlt className="mr-3 text-sm" />
                 Created {new Date(link.created_at).toLocaleDateString('en-US', { 
                   year: 'numeric', 
                   month: 'long', 
@@ -164,11 +162,11 @@ export default function LinkPage() {
 
             {/* Payment Button */}
             {!publicKey ? (
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border border-yellow-200 rounded-2xl p-6 text-center">
-                <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <FaWallet className="text-yellow-600 text-xl" />
+              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-6 text-center">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <FaWallet className="text-amber-600 text-2xl" />
                 </div>
-                <p className="text-yellow-800 font-medium">
+                <p className="text-amber-800 font-medium text-lg">
                   Connect your Solana wallet to send the payment
                 </p>
               </div>
@@ -178,21 +176,21 @@ export default function LinkPage() {
           </div>
 
           {/* Security & Trust Section */}
-          <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/20 mb-8">
+          <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-8 shadow-sm">
             <div className="text-center">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Secure & Trustless</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span>Blockchain Verified</span>
+              <h3 className="text-lg font-light text-gray-900 mb-6">Secure & Trustless</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-gray-600">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <span className="font-medium">Blockchain Verified</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>No Middleman</span>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span className="font-medium">No Middleman</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
-                  <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
-                  <span>Instant Transfer</span>
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <span className="font-medium">Instant Transfer</span>
                 </div>
               </div>
             </div>
@@ -200,16 +198,16 @@ export default function LinkPage() {
 
           {/* Footer */}
           <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-2">
+            <div className="flex items-center justify-center gap-3 mb-3">
               <Image
                 src="/paylinklogo.png"
                 alt="PayLink Logo"
-                width={24}
-                height={24}
+                width={28}
+                height={28}
               />
-              <span className="text-sm font-semibold text-gray-700">PayLink</span>
+              <span className="text-sm font-medium text-gray-700">PayLink</span>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm text-gray-500">
               Powered by Solana • Fast • Secure • Decentralized
             </p>
           </div>

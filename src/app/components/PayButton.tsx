@@ -8,9 +8,10 @@ import { FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa'
 interface PayButtonProps {
   recipient: string;
   amount: string;
+  linkId?: string;
 }
 
-export default function PayButton({ recipient, amount }: PayButtonProps) {
+export default function PayButton({ recipient, amount, linkId }: PayButtonProps) {
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
   const [loading, setLoading] = useState(false);
@@ -74,9 +75,29 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
       // Send the transaction
       const txHash = await connection.sendRawTransaction(signedTransaction.serialize());
 
-      // Wait for confirmation
-      await connection.confirmTransaction(txHash, 'confirmed');
+      // Add a 2-second delay to show processing state before success
+      // This gives users a better sense that the transaction is being processed
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
+      // Update link status to 'paid' if linkId is provided
+      if (linkId) {
+        try {
+          await fetch(`/api/links/${linkId}/pay`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              transactionHash: txHash,
+            }),
+          });
+        } catch (updateError) {
+          console.warn('Failed to update link status:', updateError);
+          // Don't fail the payment if status update fails
+        }
+      }
+
+      // Transaction is sent successfully - show success after delay
       setTxHash(txHash);
       setSuccess(true);
     } catch (err) {
@@ -104,18 +125,54 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
   return (
     <div className="space-y-6">
       {success ? (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-8 text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FaCheckCircle className="text-green-600 text-3xl" />
+        <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 border-2 border-emerald-200 rounded-3xl p-8 text-center shadow-2xl animate-in slide-in-from-bottom-4 duration-500">
+          {/* Animated background elements */}
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-4 -right-4 w-24 h-24 bg-emerald-200 rounded-full opacity-20 animate-pulse"></div>
+            <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-teal-200 rounded-full opacity-15 animate-pulse delay-1000"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-green-200 rounded-full opacity-10 animate-pulse delay-500"></div>
           </div>
-          <h3 className="text-2xl font-bold text-green-800 mb-2">Payment Successful!</h3>
-          <p className="text-green-700 mb-4">Your payment of {amount} SOL has been sent successfully.</p>
-          {txHash && (
-            <div className="bg-white rounded-lg p-3 border border-green-200">
-              <p className="text-xs text-gray-500 mb-1">Transaction Hash:</p>
-              <p className="text-sm font-mono text-gray-900 break-all">{txHash}</p>
+          
+          {/* Success icon with animation */}
+          <div className="relative z-10 mb-6">
+            <div className="w-20 h-20 bg-gradient-to-br from-emerald-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
+              <FaCheckCircle className="text-white text-4xl animate-pulse" />
             </div>
-          )}
+            <div className="w-24 h-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full mx-auto animate-pulse"></div>
+          </div>
+          
+          {/* Success content */}
+          <div className="relative z-10">
+            <h3 className="text-3xl font-bold bg-gradient-to-r from-emerald-700 to-green-700 bg-clip-text text-transparent mb-3">
+              Payment Successful! 🎉
+            </h3>
+            <p className="text-lg text-emerald-700 mb-6 font-medium">
+              Your payment of <span className="font-bold text-emerald-800">{amount} SOL</span> has been sent successfully!
+            </p>
+            
+            {txHash && (
+              <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200 shadow-lg">
+                <div className="flex items-center justify-center mb-3">
+                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping mr-2"></div>
+                  <p className="text-sm font-semibold text-gray-600 uppercase tracking-wide">Transaction Hash</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-200">
+                  <p className="text-sm font-mono text-gray-800 break-all leading-relaxed">{txHash}</p>
+                </div>
+                <a 
+                  href={`https://explorer.solana.com/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
+                >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  View on Solana Explorer
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       ) : (
         <>
@@ -127,7 +184,7 @@ export default function PayButton({ recipient, amount }: PayButtonProps) {
             {loading ? (
               <>
                 <FaSpinner className="animate-spin text-2xl" />
-                <span>Processing Payment...</span>
+                <span>Confirming Transaction...</span>
               </>
             ) : (
               <>

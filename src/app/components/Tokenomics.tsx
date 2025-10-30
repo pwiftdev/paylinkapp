@@ -1,6 +1,7 @@
 'use client'
 
 import { FaCoins } from 'react-icons/fa'
+import DotGrid from '@/components/DotGrid'
 
 const Tokenomics = () => {
   const tokenomics = {
@@ -9,20 +10,34 @@ const Tokenomics = () => {
   }
 
   return (
-    <section className="py-16 px-4 bg-gradient-to-br from-purple-50 to-pink-50">
-      <div className="max-w-4xl mx-auto">
+    <section className="px-4 relative overflow-hidden pt-12 pb-8 md:py-16 bg-[#3a3f4f]">
+      {/* Background interactive dot grid (top portion) */}
+      <div className="absolute inset-x-0 top-0 h-[600px] z-0 pointer-events-none" style={{ backgroundColor: '#3a3f4f' }}>
+        <DotGrid
+          dotSize={5}
+          gap={15}
+          baseColor="#5227FF"
+          activeColor="#5227FF"
+          proximity={120}
+          shockRadius={250}
+          shockStrength={5}
+          resistance={750}
+          returnDuration={1.5}
+        />
+      </div>
+      <div className="max-w-4xl mx-auto relative z-10">
         <div className="text-center mb-10 animate-fade-in-up">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 border border-purple-200 rounded-full mb-4 hover:scale-105 transition-transform duration-300 cursor-default">
             <FaCoins className="text-purple-600 animate-pulse" />
             <span className="text-purple-700 font-medium">Tokenomics</span>
           </div>
-          <h2 className="text-4xl font-bold text-gray-900 mb-2">
+          <h2 className="text-4xl font-bold text-white mb-2">
             {tokenomics.symbol} Token
           </h2>
-          <p className="text-lg text-gray-600 mb-6">
+          <p className="text-lg text-gray-200 mb-6">
             Powering the PayLink ecosystem on Solana
           </p>
-          <p className="text-2xl font-bold text-purple-600 animate-pulse">
+          <p className="text-2xl font-bold text-purple-400 animate-pulse">
             100% Fair Launch via PumpFun
           </p>
         </div>

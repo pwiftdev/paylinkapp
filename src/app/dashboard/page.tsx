@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWallet } from '@solana/wallet-adapter-react';
+import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaPlus, FaLink, FaSignOutAlt, FaSpinner, FaCopy, FaExternalLinkAlt, FaCalendarAlt, FaWallet, FaChartLine, FaCheckCircle, FaArrowRight, FaEllipsisV } from 'react-icons/fa';
+import { FaPlus, FaLink, FaSignOutAlt, FaSpinner, FaCopy, FaExternalLinkAlt, FaCalendarAlt, FaWallet, FaChartLine, FaCheckCircle, FaArrowRight, FaEllipsisV, FaCoins } from 'react-icons/fa';
 
 interface UserData {
   id: string;
@@ -19,16 +19,36 @@ interface LinkData {
   recipient: string;
   amount: string;
   message: string | null;
+  status: 'pending' | 'paid' | 'cancelled';
+  transaction_hash: string | null;
+  paid_at: string | null;
   created_at: string;
 }
 
 export default function DashboardPage() {
   const router = useRouter();
   const { publicKey, disconnect } = useWallet();
+  const { connection } = useConnection();
   const [user, setUser] = useState<UserData | null>(null);
   const [links, setLinks] = useState<LinkData[]>([]);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState<string | null>(null);
+  const [balance, setBalance] = useState<number | null>(null);
+  const [balanceLoading, setBalanceLoading] = useState(false);
+
+  const fetchBalance = async () => {
+    if (!publicKey || !connection) return;
+    
+    setBalanceLoading(true);
+    try {
+      const balance = await connection.getBalance(publicKey);
+      setBalance(balance / 1e9); // Convert lamports to SOL
+    } catch (error) {
+      console.error('Failed to fetch balance:', error);
+    } finally {
+      setBalanceLoading(false);
+    }
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -59,7 +79,8 @@ export default function DashboardPage() {
     };
 
     fetchUser();
-  }, [publicKey, router]);
+    fetchBalance();
+  }, [publicKey, router, connection]);
 
   if (loading) {
     return (
@@ -88,16 +109,41 @@ export default function DashboardPage() {
   const completedPayments = links.length;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+    <main className="min-h-screen relative overflow-hidden">
+      {/* Hero Section Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-purple-900/30 animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.2),transparent_50%)] animate-pulse"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Content with backdrop blur */}
+      <div className="relative z-10 max-w-6xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-4xl font-light text-gray-900 mb-2">
-                Welcome back, <span className="font-medium bg-gradient-to-r from-purple-600 to-purple-700 bg-clip-text text-transparent">@{user.username}</span>
+              <h1 className="text-4xl font-light text-white mb-2">
+                Welcome back, <span className="font-medium bg-gradient-to-r from-purple-300 to-pink-300 bg-clip-text text-transparent">@{user.username}</span>
               </h1>
-              <div className="flex items-center gap-3 text-gray-500">
+              <div className="flex items-center gap-3 text-gray-300">
                 <div className="flex items-center gap-2">
                   <FaWallet className="text-sm" />
                   <span className="font-mono text-sm">
@@ -106,10 +152,10 @@ export default function DashboardPage() {
                 </div>
                 <button
                   onClick={() => copyToClipboard(publicKey.toString())}
-                  className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-1.5 hover:bg-white/20 rounded-lg transition-colors"
                   title="Copy address"
                 >
-                  <FaCopy className="text-xs" />
+                  <FaCopy className="text-xs text-white" />
                 </button>
               </div>
             </div>
@@ -118,7 +164,7 @@ export default function DashboardPage() {
                 disconnect();
                 router.push('/register');
               }}
-              className="flex items-center gap-2 px-4 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-all duration-200"
+              className="flex items-center gap-2 px-4 py-2 text-gray-300 hover:text-white hover:bg-white/20 rounded-lg transition-all duration-200"
             >
               <FaSignOutAlt className="text-sm" />
               <span className="text-sm font-medium">Sign out</span>
@@ -127,45 +173,75 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-purple-200 transition-all duration-200 group">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+          {/* Wallet Balance Card */}
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-emerald-300/50 transition-all duration-200 group shadow-xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="w-12 h-12 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl flex items-center justify-center group-hover:from-emerald-100 group-hover:to-emerald-200 transition-all duration-200">
+                <FaCoins className="text-emerald-600 text-lg" />
+              </div>
+              <button
+                onClick={fetchBalance}
+                disabled={balanceLoading}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                title="Refresh balance"
+              >
+                <FaSpinner className={`text-xs text-gray-400 ${balanceLoading ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
+            <div className="text-3xl font-light text-white mb-1">
+              {balanceLoading ? (
+                <div className="flex items-center gap-2">
+                  <FaSpinner className="animate-spin text-lg text-gray-300" />
+                  <span className="text-gray-300">Loading...</span>
+                </div>
+              ) : balance !== null ? (
+                `${balance.toFixed(4)} SOL`
+              ) : (
+                <span className="text-gray-300">--</span>
+              )}
+            </div>
+            <div className="text-gray-300 text-sm font-medium">Wallet Balance</div>
+          </div>
+
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-purple-300/50 transition-all duration-200 group shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl flex items-center justify-center group-hover:from-purple-100 group-hover:to-purple-200 transition-all duration-200">
                 <FaLink className="text-purple-600 text-lg" />
               </div>
             </div>
-            <div className="text-3xl font-light text-gray-900 mb-1">{completedPayments}</div>
-            <div className="text-gray-500 text-sm font-medium">Active PayLinks</div>
+            <div className="text-3xl font-light text-white mb-1">{completedPayments}</div>
+            <div className="text-gray-300 text-sm font-medium">Active PayLinks</div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-blue-200 transition-all duration-200 group">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-blue-300/50 transition-all duration-200 group shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl flex items-center justify-center group-hover:from-blue-100 group-hover:to-blue-200 transition-all duration-200">
                 <FaChartLine className="text-blue-600 text-lg" />
               </div>
             </div>
-            <div className="text-3xl font-light text-gray-900 mb-1">{totalAmount.toFixed(2)}</div>
-            <div className="text-gray-500 text-sm font-medium">Total Requested (SOL)</div>
+            <div className="text-3xl font-light text-white mb-1">{totalAmount.toFixed(2)}</div>
+            <div className="text-gray-300 text-sm font-medium">Total Requested (SOL)</div>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 border border-gray-200 hover:border-green-200 transition-all duration-200 group">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 hover:border-green-300/50 transition-all duration-200 group shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <div className="w-12 h-12 bg-gradient-to-br from-green-50 to-green-100 rounded-xl flex items-center justify-center group-hover:from-green-100 group-hover:to-green-200 transition-all duration-200">
                 <FaCheckCircle className="text-green-600 text-lg" />
               </div>
             </div>
-            <div className="text-3xl font-light text-gray-900 mb-1">{completedPayments}</div>
-            <div className="text-gray-500 text-sm font-medium">Completed</div>
+            <div className="text-3xl font-light text-white mb-1">{completedPayments}</div>
+            <div className="text-gray-300 text-sm font-medium">Completed</div>
           </div>
         </div>
 
         {/* Quick Actions */}
         <div className="mb-12">
-          <div className="bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl p-8 border border-purple-200">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-xl">
             <div className="flex items-center justify-between mb-6">
               <div>
-                <h2 className="text-2xl font-light text-gray-900 mb-2">Create a New PayLink</h2>
-                <p className="text-gray-600 max-w-2xl">
+                <h2 className="text-2xl font-light text-white mb-2">Create a New PayLink</h2>
+                <p className="text-gray-300 max-w-2xl">
                   Generate a payment link with recipient, amount, and memo. Share it with anyone to receive SOL payments instantly.
                 </p>
               </div>
@@ -183,15 +259,15 @@ export default function DashboardPage() {
 
         {/* Links Section */}
         <div>
-          <div className="bg-white rounded-2xl border border-gray-200">
-            <div className="px-8 py-6 border-b border-gray-200">
+          <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
+            <div className="px-8 py-6 border-b border-white/20">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-light text-gray-900">Your PayLinks</h2>
-                  <p className="text-gray-500 mt-1">Manage and track all your payment requests</p>
+                  <h2 className="text-2xl font-light text-white">Your PayLinks</h2>
+                  <p className="text-gray-300 mt-1">Manage and track all your payment requests</p>
                 </div>
-                <div className="px-3 py-1.5 bg-gray-100 rounded-lg">
-                  <span className="text-gray-600 text-sm font-medium">{links.length} total</span>
+                <div className="px-3 py-1.5 bg-white/20 rounded-lg">
+                  <span className="text-white text-sm font-medium">{links.length} total</span>
                 </div>
               </div>
             </div>
@@ -199,11 +275,11 @@ export default function DashboardPage() {
             
             {links.length === 0 ? (
               <div className="text-center py-16">
-                <div className="w-16 h-16 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                  <FaLink className="text-2xl text-purple-500" />
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-2xl flex items-center justify-center mx-auto mb-6 backdrop-blur-sm border border-white/20">
+                  <FaLink className="text-2xl text-purple-300" />
                 </div>
-                <h3 className="text-xl font-medium text-gray-900 mb-2">No PayLinks yet</h3>
-                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                <h3 className="text-xl font-medium text-white mb-2">No PayLinks yet</h3>
+                <p className="text-gray-300 mb-8 max-w-md mx-auto">
                   Create your first payment link to start receiving SOL payments instantly
                 </p>
                 <Link
@@ -220,27 +296,37 @@ export default function DashboardPage() {
                 {links.map((link, index) => (
                   <div
                     key={link.id}
-                    className="group border border-gray-200 rounded-xl p-6 hover:border-purple-200 hover:shadow-sm transition-all duration-200"
+                    className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:border-purple-300/50 hover:bg-white/10 hover:shadow-lg transition-all duration-200"
                   >
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-3">
-                          <span className="text-2xl font-light text-gray-900">
+                          <span className="text-2xl font-light text-white">
                             {link.amount} SOL
                           </span>
+                          {/* Payment Status Badge */}
+                          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                            link.status === 'paid' 
+                              ? 'bg-green-500/20 text-green-300 border border-green-400/30' 
+                              : link.status === 'cancelled'
+                              ? 'bg-red-500/20 text-red-300 border border-red-400/30'
+                              : 'bg-yellow-500/20 text-yellow-300 border border-yellow-400/30'
+                          }`}>
+                            {link.status === 'paid' ? 'Paid' : link.status === 'cancelled' ? 'Cancelled' : 'Pending'}
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
+                        <div className="flex items-center gap-2 text-sm text-gray-300 mb-3">
                           <span className="font-medium">To:</span>
-                          <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">
+                          <span className="font-mono bg-white/10 px-2 py-1 rounded text-xs text-white">
                             {link.recipient.slice(0, 8)}...{link.recipient.slice(-8)}
                           </span>
                         </div>
                         {link.message && (
-                          <p className="text-sm text-gray-600 mb-3 bg-gray-50 px-3 py-2 rounded-lg">
+                          <p className="text-sm text-gray-300 mb-3 bg-white/10 px-3 py-2 rounded-lg">
                             {link.message}
                           </p>
                         )}
-                        <div className="flex items-center gap-2 text-xs text-gray-400">
+                        <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
                           <FaCalendarAlt />
                           {new Date(link.created_at).toLocaleDateString('en-US', { 
                             year: 'numeric', 
@@ -248,20 +334,45 @@ export default function DashboardPage() {
                             day: 'numeric' 
                           })}
                         </div>
+                        {link.status === 'paid' && link.paid_at && (
+                          <div className="flex items-center gap-2 text-xs text-green-300 mb-2">
+                            <FaCheckCircle />
+                            Paid on {new Date(link.paid_at).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'short', 
+                              day: 'numeric' 
+                            })}
+                          </div>
+                        )}
+                        {link.status === 'paid' && link.transaction_hash && (
+                          <div className="flex items-center gap-2 text-xs text-gray-400">
+                            <span className="font-mono bg-white/10 px-2 py-1 rounded text-xs text-white">
+                              {link.transaction_hash.slice(0, 8)}...{link.transaction_hash.slice(-8)}
+                            </span>
+                            <a
+                              href={`https://explorer.solana.com/tx/${link.transaction_hash}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-300 hover:text-blue-200"
+                            >
+                              <FaExternalLinkAlt className="text-xs" />
+                            </a>
+                          </div>
+                        )}
                       </div>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                      <button className="p-2 hover:bg-white/20 rounded-lg transition-colors">
                         <FaEllipsisV className="text-gray-400 text-sm" />
                       </button>
                     </div>
-                    <div className="flex items-center gap-3 pt-4 border-t border-gray-100">
+                    <div className="flex items-center gap-3 pt-4 border-t border-white/10">
                       <button
                         onClick={() => copyToClipboard(`${window.location.origin}/link/${link.id}`)}
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-all font-medium"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-gray-300 hover:text-white hover:bg-white/20 rounded-lg transition-all font-medium"
                         title="Copy link"
                       >
                         {copied === `${window.location.origin}/link/${link.id}` ? (
                           <>
-                            <FaCheckCircle className="text-green-500 text-sm" />
+                            <FaCheckCircle className="text-green-400 text-sm" />
                             Copied!
                           </>
                         ) : (
@@ -273,7 +384,7 @@ export default function DashboardPage() {
                       </button>
                       <Link
                         href={`/link/${link.id}`}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-medium shadow-sm hover:shadow-md"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-lg hover:from-purple-500 hover:to-purple-600 transition-all font-medium shadow-sm hover:shadow-md backdrop-blur-sm"
                       >
                         <span className="text-sm">View</span>
                         <FaExternalLinkAlt className="text-xs" />

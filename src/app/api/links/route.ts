@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { v4 as uuidv4 } from 'uuid';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 // POST /api/links - Create a new pay link
 export async function POST(request: NextRequest) {
   try {

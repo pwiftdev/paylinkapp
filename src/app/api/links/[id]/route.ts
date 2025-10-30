@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -40,6 +43,9 @@ export async function GET(
       recipient: data.recipient,
       amount: data.amount,
       message: data.message,
+      status: data.status,
+      transaction_hash: data.transaction_hash,
+      paid_at: data.paid_at,
       created_at: data.created_at,
     });
   } catch (error) {

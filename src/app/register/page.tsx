@@ -80,21 +80,70 @@ export default function RegisterPage() {
 
   if (checkingExisting) {
     return (
-      <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 flex items-center justify-center">
-        <div className="text-center">
-          <FaSpinner className="inline-block animate-spin text-4xl text-purple-600 mb-4" />
-          <p className="text-gray-600 font-medium text-lg">Checking wallet...</p>
+      <main className="min-h-screen relative overflow-hidden flex items-center justify-center">
+        {/* Hero Section Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600">
+          {/* Animated Background Pattern */}
+          <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-purple-900/30 animate-pulse"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] animate-pulse"></div>
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.2),transparent_50%)] animate-pulse"></div>
+          
+          {/* Floating particles */}
+          <div className="absolute inset-0 overflow-hidden">
+            {[...Array(20)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDelay: `${Math.random() * 3}s`,
+                  animationDuration: `${3 + Math.random() * 2}s`,
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        
+        <div className="relative z-10 text-center">
+          <FaSpinner className="inline-block animate-spin text-4xl text-purple-300 mb-4" />
+          <p className="text-gray-300 font-medium text-lg">Checking wallet...</p>
         </div>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 py-12 px-4">
-      <div className="max-w-md mx-auto">
+    <main className="min-h-screen relative overflow-hidden py-12 px-4">
+      {/* Hero Section Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-purple-900/30 animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.2),transparent_50%)] animate-pulse"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Content with backdrop blur */}
+      <div className="relative z-10 max-w-md mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <Link href="/" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-8 transition-colors">
+          <Link href="/" className="inline-flex items-center text-gray-300 hover:text-white mb-8 transition-colors">
             <FaArrowLeft className="mr-2 text-sm" />
             <span className="text-sm font-medium">Back to Home</span>
           </Link>
@@ -105,40 +154,40 @@ export default function RegisterPage() {
             height={80}
             className="mx-auto mb-6"
           />
-          <h1 className="text-4xl font-light text-gray-900 mb-3">
+          <h1 className="text-4xl font-light text-white mb-3">
             {publicKey ? 'Create Your Account' : 'Welcome to PayLink'}
           </h1>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-300 text-lg">
             {publicKey ? 'Choose your @username to get started' : 'Connect your Solana wallet to continue'}
           </p>
         </div>
 
         {/* Main Card */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-xl">
           {/* Wallet Connection */}
           <div className="mb-8">
-            <div className="flex items-center justify-between p-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border border-purple-200">
+            <div className="flex items-center justify-between p-6 bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mr-4">
-                  <FaWallet className="text-xl text-purple-600" />
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl flex items-center justify-center mr-4">
+                  <FaWallet className="text-xl text-purple-300" />
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Wallet Status</p>
-                  <p className="text-sm text-gray-600">
+                  <p className="font-medium text-white">Wallet Status</p>
+                  <p className="text-sm text-gray-300">
                     {publicKey ? 'Connected' : 'Not connected'}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setVisible(true)}
-                className="px-4 py-2 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg hover:from-purple-700 hover:to-purple-800 transition-all font-medium text-sm shadow-sm hover:shadow-md"
+                className="px-4 py-2 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-lg hover:from-purple-500 hover:to-purple-600 transition-all font-medium text-sm shadow-sm hover:shadow-md backdrop-blur-sm"
               >
                 {publicKey ? 'Change' : 'Connect'}
               </button>
             </div>
             
             {publicKey && (
-              <p className="text-xs text-gray-500 mt-3 text-center font-mono">
+              <p className="text-xs text-gray-400 mt-3 text-center font-mono">
                 {publicKey.toString().slice(0, 8)}...{publicKey.toString().slice(-8)}
               </p>
             )}
@@ -148,43 +197,43 @@ export default function RegisterPage() {
           {publicKey && (
             <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-4">
+                <label className="block text-sm font-medium text-gray-300 mb-4">
                   <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
-                      <FaUser className="text-purple-600 text-sm" />
+                    <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-lg flex items-center justify-center">
+                      <FaUser className="text-purple-300 text-sm" />
                     </div>
                     <span>Choose Your @Username</span>
                   </div>
                 </label>
                 <div className="flex items-center">
-                  <span className="text-gray-500 mr-3 text-xl font-medium">@</span>
+                  <span className="text-gray-400 mr-3 text-xl font-medium">@</span>
                   <input
                     type="text"
                     value={username}
                     onChange={(e) => setUsername(e.target.value.toLowerCase())}
                     placeholder="yourusername"
-                    className="flex-1 px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-lg placeholder-gray-400 text-gray-900 transition-all"
+                    className="flex-1 px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 text-lg placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
                     maxLength={20}
                   />
                 </div>
-                <p className="mt-3 text-sm text-gray-500">
+                <p className="mt-3 text-sm text-gray-400">
                   3-20 characters, letters, numbers, and underscores only
                 </p>
                 {username && !isValidUsername && (
-                  <p className="mt-2 text-sm text-red-600">Invalid username format</p>
+                  <p className="mt-2 text-sm text-red-300">Invalid username format</p>
                 )}
               </div>
 
               {error && (
-                <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                  <p className="text-red-800 text-sm font-medium">{error}</p>
+                <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
+                  <p className="text-red-200 text-sm font-medium">{error}</p>
                 </div>
               )}
 
               <button
                 onClick={handleCreateAccount}
                 disabled={!isValidUsername || loading}
-                className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                className="w-full px-6 py-4 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-xl hover:from-purple-500 hover:to-purple-600 transition-all font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl backdrop-blur-sm"
               >
                 {loading ? (
                   <>
@@ -203,11 +252,11 @@ export default function RegisterPage() {
 
           {!publicKey && (
             <div className="text-center py-12">
-              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border border-amber-200 rounded-xl p-8">
-                <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <FaWallet className="text-2xl text-amber-600" />
+              <div className="bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 rounded-xl p-8 backdrop-blur-sm">
+                <div className="w-16 h-16 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
+                  <FaWallet className="text-2xl text-amber-300" />
                 </div>
-                <p className="text-amber-800 font-medium">
+                <p className="text-amber-200 font-medium">
                   Please connect your Solana wallet above to create your PayLink account
                 </p>
               </div>
@@ -217,7 +266,7 @@ export default function RegisterPage() {
 
         {/* Footer */}
         <div className="text-center mt-12">
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-400">
             By creating an account, you agree to our terms of service
           </p>
         </div>

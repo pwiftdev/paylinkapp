@@ -23,6 +23,7 @@ export default function CreateLinkPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLoading, setUserLoading] = useState(true);
+  const [isCustomRecipient, setIsCustomRecipient] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -39,6 +40,8 @@ export default function CreateLinkPage() {
         }
         const data = await response.json();
         setUser(data);
+        // Set the recipient to the user's wallet address by default
+        setRecipient(data.wallet);
       } catch (error) {
         console.error('Failed to fetch user:', error);
         router.push('/register');
@@ -85,6 +88,7 @@ export default function CreateLinkPage() {
   };
 
   const isValidRecipient = recipient.length > 0 && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(recipient);
+  const isUsingDefaultWallet = !isCustomRecipient && user?.wallet;
   const isValidAmount = amount.length > 0 && parseFloat(amount) > 0;
 
   if (userLoading) {
@@ -99,11 +103,36 @@ export default function CreateLinkPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-100 via-purple-50 to-purple-100 py-12 px-4">
-      <div className="max-w-2xl mx-auto">
+    <main className="min-h-screen relative overflow-hidden py-12 px-4">
+      {/* Hero Section Background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600">
+        {/* Animated Background Pattern */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-purple-900/30 animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(120,119,198,0.3),transparent_50%)] animate-pulse"></div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(147,51,234,0.2),transparent_50%)] animate-pulse"></div>
+        
+        {/* Floating particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute w-2 h-2 bg-white/20 rounded-full animate-float"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 3}s`,
+                animationDuration: `${3 + Math.random() * 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      </div>
+      
+      {/* Content with backdrop blur */}
+      <div className="relative z-10 max-w-2xl mx-auto">
         {/* Header */}
         <div className="mb-12">
-          <Link href="/dashboard" className="inline-flex items-center text-gray-500 hover:text-gray-700 mb-8 transition-colors">
+          <Link href="/dashboard" className="inline-flex items-center text-gray-300 hover:text-white mb-8 transition-colors">
             <FaArrowLeft className="mr-2 text-sm" />
             <span className="text-sm font-medium">Back to Dashboard</span>
           </Link>
@@ -115,20 +144,20 @@ export default function CreateLinkPage() {
               height={80}
               className="mx-auto mb-6"
             />
-            <h1 className="text-4xl font-light text-gray-900 mb-3">Create PayLink</h1>
-            <p className="text-gray-600 text-lg">Generate a payment request link</p>
+            <h1 className="text-4xl font-light text-white mb-3">Create PayLink</h1>
+            <p className="text-gray-300 text-lg">Generate a payment request link</p>
           </div>
         </div>
 
         {/* Main Form */}
-        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+        <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 p-8 shadow-xl">
           {!user ? (
             <div className="text-center py-12">
               <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-yellow-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <FaExclamationTriangle className="text-2xl text-amber-600" />
               </div>
-              <h3 className="text-xl font-medium text-gray-900 mb-3">Account Required</h3>
-              <p className="text-gray-600 mb-8 text-lg">
+              <h3 className="text-xl font-medium text-white mb-3">Account Required</h3>
+              <p className="text-gray-300 mb-8 text-lg">
                 You need to create an account first to create PayLinks
               </p>
               <Link
@@ -142,14 +171,14 @@ export default function CreateLinkPage() {
           ) : (
             <>
               {/* User Info */}
-              <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-6 mb-8">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6 mb-8">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-100 to-purple-200 rounded-xl flex items-center justify-center mr-4">
-                    <FaUser className="text-xl text-purple-600" />
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-xl flex items-center justify-center mr-4">
+                    <FaUser className="text-xl text-purple-300" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-purple-900">Creating as</p>
-                    <p className="text-xl font-medium text-purple-800">@{user.username}</p>
+                    <p className="text-sm font-medium text-gray-300">Creating as</p>
+                    <p className="text-xl font-medium text-white">@{user.username}</p>
                   </div>
                 </div>
               </div>
@@ -157,23 +186,71 @@ export default function CreateLinkPage() {
               <div className="space-y-8">
                 {/* Recipient Address */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center">
-                        <FaWallet className="text-purple-600 text-sm" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-lg flex items-center justify-center">
+                        <FaWallet className="text-purple-300 text-sm" />
                       </div>
                       <span>Destination Wallet Address</span>
                     </div>
                   </label>
-                  <input
-                    type="text"
-                    value={recipient}
-                    onChange={(e) => setRecipient(e.target.value)}
-                    placeholder="Enter recipient's Solana wallet address"
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-lg font-mono placeholder-gray-400 text-gray-900 transition-all"
-                  />
+                  
+                  {!isCustomRecipient ? (
+                    <div className="space-y-4">
+                      {/* Default Wallet Display */}
+                      <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-400/30 rounded-xl p-4 backdrop-blur-sm">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                              <span className="text-sm font-medium text-green-300">Default Wallet (Your Account)</span>
+                            </div>
+                            <p className="text-sm font-mono text-white break-all">{user?.wallet}</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Another Wallet Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCustomRecipient(true);
+                          setRecipient('');
+                        }}
+                        className="w-full px-4 py-3 border border-white/30 rounded-xl hover:bg-white/10 transition-all text-gray-300 hover:text-white font-medium flex items-center justify-center gap-2"
+                      >
+                        <FaWallet className="text-sm" />
+                        Use Another Wallet
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {/* Custom Wallet Input */}
+                      <input
+                        type="text"
+                        value={recipient}
+                        onChange={(e) => setRecipient(e.target.value)}
+                        placeholder="Enter recipient's Solana wallet address"
+                        className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 text-lg font-mono placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
+                      />
+                      
+                      {/* Back to Default Button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsCustomRecipient(false);
+                          setRecipient(user?.wallet || '');
+                        }}
+                        className="w-full px-4 py-3 border border-purple-400/30 rounded-xl hover:bg-purple-500/20 transition-all text-purple-300 hover:text-white font-medium flex items-center justify-center gap-2"
+                      >
+                        <FaWallet className="text-sm" />
+                        Use My Default Wallet
+                      </button>
+                    </div>
+                  )}
+                  
                   {recipient && !isValidRecipient && (
-                    <p className="mt-3 text-sm text-red-600 flex items-center">
+                    <p className="mt-3 text-sm text-red-300 flex items-center">
                       <FaExclamationTriangle className="mr-2 text-sm" />
                       Invalid Solana address
                     </p>
@@ -182,10 +259,10 @@ export default function CreateLinkPage() {
 
                 {/* Amount */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center">
-                        <FaDollarSign className="text-green-600 text-sm" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-green-500/20 to-green-600/20 rounded-lg flex items-center justify-center">
+                        <FaDollarSign className="text-green-300 text-sm" />
                       </div>
                       <span>Amount (SOL)</span>
                     </div>
@@ -196,10 +273,10 @@ export default function CreateLinkPage() {
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.0"
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-lg placeholder-gray-400 text-gray-900 transition-all"
+                    className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 text-lg placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
                   />
                   {amount && !isValidAmount && (
-                    <p className="mt-3 text-sm text-red-600 flex items-center">
+                    <p className="mt-3 text-sm text-red-300 flex items-center">
                       <FaExclamationTriangle className="mr-2 text-sm" />
                       Amount must be greater than 0
                     </p>
@@ -208,10 +285,10 @@ export default function CreateLinkPage() {
 
                 {/* Message */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-4">
+                  <label className="block text-sm font-medium text-gray-300 mb-4">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex items-center justify-center">
-                        <FaComment className="text-blue-600 text-sm" />
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg flex items-center justify-center">
+                        <FaComment className="text-blue-300 text-sm" />
                       </div>
                       <span>Payment Memo (Optional)</span>
                     </div>
@@ -221,16 +298,16 @@ export default function CreateLinkPage() {
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Add a note about this payment..."
                     rows={4}
-                    className="w-full px-4 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 resize-none placeholder-gray-400 text-gray-900 transition-all"
+                    className="w-full px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 resize-none placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
                   />
                 </div>
 
                 {/* Error Message */}
                 {error && (
-                  <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                  <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
                     <div className="flex items-center">
-                      <FaExclamationTriangle className="text-red-600 mr-3 text-sm" />
-                      <p className="text-red-800 font-medium">{error}</p>
+                      <FaExclamationTriangle className="text-red-300 mr-3 text-sm" />
+                      <p className="text-red-200 font-medium">{error}</p>
                     </div>
                   </div>
                 )}
@@ -238,8 +315,8 @@ export default function CreateLinkPage() {
                 {/* Submit Button */}
                 <button
                   onClick={handleCreateLink}
-                  disabled={!isValidRecipient || !isValidAmount || loading}
-                  className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-xl hover:from-purple-700 hover:to-purple-800 transition-all font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl"
+                  disabled={(!isValidRecipient && !isUsingDefaultWallet) || !isValidAmount || loading}
+                  className="w-full px-6 py-4 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-xl hover:from-purple-500 hover:to-purple-600 transition-all font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl backdrop-blur-sm"
                 >
                   {loading ? (
                     <>

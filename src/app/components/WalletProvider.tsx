@@ -9,23 +9,13 @@ import {
   SolflareWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { clusterApiUrl } from '@solana/web3.js';
-import { SOLANA_NETWORK, RPC_ENDPOINTS, getPreferredRpc } from '@/lib/config';
+import { SOLANA_NETWORK } from '@/lib/config';
 
 require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const CustomWalletProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const network = SOLANA_NETWORK as WalletAdapterNetwork;
-  const endpoint = useMemo(() => {
-    try {
-      const rpcEndpoint = getPreferredRpc(network as keyof typeof RPC_ENDPOINTS);
-      console.log('Using RPC endpoint:', rpcEndpoint);
-      return rpcEndpoint;
-    } catch {
-      const fallbackEndpoint = clusterApiUrl(network);
-      console.log('Using fallback RPC endpoint:', fallbackEndpoint);
-      return fallbackEndpoint;
-    }
-  }, [network]);
+  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
   const wallets = useMemo(
     () => [

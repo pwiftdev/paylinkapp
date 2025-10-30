@@ -4,14 +4,38 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 import Tokenomics from './components/Tokenomics';
+import { useEffect, useState } from 'react';
+import CountUp from '@/components/CountUp';
+import Ballpit from '@/components/Ballpit';
+import InfiniteScroll from '@/components/InfiniteScroll';
 
 export default function Home() {
+  const [stats, setStats] = useState<{ users: number; links: number; totalRequestedSol: number } | null>(null);
+  const [loadingStats, setLoadingStats] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchStats = async () => {
+      try {
+        const res = await fetch('/api/stats', { cache: 'no-store' });
+        if (!res.ok) throw new Error('Failed to fetch stats');
+        const data = await res.json();
+        if (isMounted) setStats(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (isMounted) setLoadingStats(false);
+      }
+    };
+    fetchStats();
+    return () => { isMounted = false; };
+  }, []);
 
   return (
     <main className="min-h-screen bg-white">
       {/* Hero Section */}
       <section 
-        className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600 flex items-center justify-center px-4 relative overflow-hidden"
+        className="min-h-screen bg-gradient-to-br from-gray-800 via-gray-700 to-purple-600 flex items-center justify-center px-4 relative overflow-hidden pt-16 pb-24 md:pt-0 md:pb-0"
       >
         {/* Animated Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/20 via-transparent to-purple-900/30 animate-pulse"></div>
@@ -92,9 +116,22 @@ export default function Home() {
         </div>
       </section>
 
+      
+
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
+      <section id="features" className="py-20 px-4 bg-gray-50 relative overflow-hidden min-h-[500px]">
+        {/* Ballpit Background */}
+        <div className="absolute inset-0">
+          <Ballpit
+            count={50}
+            gravity={1}
+            friction={0.99}
+            wallBounce={0.95}
+            followCursor={true}
+            colors={[0x5b21b6, 0x7c3aed, 0xa855f7, 0xc084fc]}
+          />
+        </div>
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose PayLink?</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
@@ -102,29 +139,50 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              { icon: FaShieldAlt, color: 'purple', title: 'Secure & Trustless', desc: 'Built on Solana blockchain with no central authority. Your funds are always in your control.' },
-              { icon: FaGlobe, color: 'blue', title: 'Global & Instant', desc: 'Send and receive payments anywhere in the world in seconds with minimal fees.' },
-              { icon: FaMobile, color: 'green', title: 'Mobile First', desc: 'Optimized for mobile devices. Perfect for on-the-go payments and requests.' },
-              { icon: FaUser, color: 'pink', title: 'Personal Branding', desc: 'Create your unique @username and build your payment identity on Solana.' },
-              { icon: FaLink, color: 'indigo', title: 'Easy Sharing', desc: 'Generate shareable links with pre-filled payment details for seamless transactions.' },
-              { icon: FaBolt, color: 'yellow', title: 'Lightning Fast', desc: "Solana's high throughput ensures instant confirmations and low transaction costs." },
-            ].map((feature, index) => {
-              const Icon = feature.icon;
+          {/* Infinite Scroll stack replacing grid */}
+          <div className="relative flex justify-center" style={{ height: '500px' }}>
+            {(() => {
+              const colorClassMap: Record<string, string> = {
+                purple: 'text-purple-600',
+                blue: 'text-blue-600',
+                green: 'text-green-600',
+                pink: 'text-pink-600',
+                indigo: 'text-indigo-600',
+                yellow: 'text-yellow-600',
+              };
+              const data = [
+                { icon: FaShieldAlt, color: 'purple', title: 'Secure & Trustless', desc: 'Built on Solana blockchain with no central authority. Your funds are always in your control.' },
+                { icon: FaGlobe, color: 'blue', title: 'Global & Instant', desc: 'Send and receive payments anywhere in the world in seconds with minimal fees.' },
+                { icon: FaMobile, color: 'green', title: 'Mobile First', desc: 'Optimized for mobile devices. Perfect for on-the-go payments and requests.' },
+                { icon: FaUser, color: 'pink', title: 'Personal Branding', desc: 'Create your unique @username and build your payment identity on Solana.' },
+                { icon: FaLink, color: 'indigo', title: 'Easy Sharing', desc: 'Generate shareable links with pre-filled payment details for seamless transactions.' },
+                { icon: FaBolt, color: 'yellow', title: 'Lightning Fast', desc: "Solana's high throughput ensures instant confirmations and low transaction costs." },
+              ];
+              const items = data.map(({ icon: Icon, color, title, desc }) => ({
+                content: (
+                  <div className="bg-white/90 backdrop-blur rounded-xl p-5 md:p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
+                    <Icon className={`text-3xl ${colorClassMap[color]} mb-3 md:mb-4`} />
+                    <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3">{title}</h3>
+                    <p className="text-sm md:text-base text-gray-600">{desc}</p>
+                  </div>
+                )
+              }));
               return (
-                <div
-                  key={index}
-                  className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2"
-                >
-                  <Icon className={`text-3xl text-${feature.color}-600 mb-4 group-hover:scale-125 transition-transform duration-300`} />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-purple-600 transition-colors">{feature.title}</h3>
-                  <p className="text-gray-600 group-hover:text-gray-700 transition-colors">
-                    {feature.desc}
-                  </p>
-                </div>
+                <InfiniteScroll
+                  items={items}
+                  isTilted={true}
+                  tiltDirection="left"
+                  autoplay={true}
+                  autoplaySpeed={0.2}
+                  autoplayDirection="down"
+                  pauseOnHover={true}
+                  width="28rem"
+                  maxHeight="100%"
+                  negativeMargin="-0.75em"
+                  itemMinHeight={140}
+                />
               );
-            })}
+            })()}
           </div>
         </div>
       </section>
@@ -166,7 +224,7 @@ export default function Home() {
       <Tokenomics />
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-to-r from-gray-800 via-purple-600 to-pink-600 relative overflow-hidden">
+      <section className="px-4 bg-gradient-to-r from-gray-800 via-purple-600 to-pink-600 relative overflow-hidden pt-10 pb-16 md:py-20">
         {/* Background Pattern */}
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900/30 via-transparent to-purple-900/20 animate-pulse"></div>
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_50%,rgba(147,51,234,0.2),transparent_50%)]"></div>
@@ -184,6 +242,41 @@ export default function Home() {
             Start Creating Links
             <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
           </Link>
+        </div>
+      </section>
+
+      {/* Stats Section (Last) */}
+      <section className="py-16 px-4 bg-white border-t border-gray-100">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-gray-900 mb-3">PayLink by the Numbers</h2>
+            <p className="text-gray-600">Live stats from our community</p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
+              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Users</div>
+              <CountUp
+                end={loadingStats ? 0 : stats?.users ?? 0}
+                className="text-4xl font-extrabold text-gray-900"
+              />
+            </div>
+            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
+              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Links Created</div>
+              <CountUp
+                end={loadingStats ? 0 : stats?.links ?? 0}
+                className="text-4xl font-extrabold text-gray-900"
+              />
+            </div>
+            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
+              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Total SOL Requested</div>
+              <CountUp
+                end={loadingStats ? 0 : stats?.totalRequestedSol ?? 0}
+                decimals={2}
+                suffix=" SOL"
+                className="text-4xl font-extrabold text-gray-900"
+              />
+            </div>
+          </div>
         </div>
       </section>
 

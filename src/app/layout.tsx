@@ -8,6 +8,11 @@ export const metadata = {
   description: 'Create personalized payment links with your @username. Request SOL payments with ease on Solana.',
   keywords: 'Solana, payments, crypto, blockchain, payment links, SOL',
   authors: [{ name: 'PayLink Team' }],
+  icons: {
+    icon: '/paylinklogo.png',
+    shortcut: '/paylinklogo.png',
+    apple: '/paylinklogo.png',
+  },
   openGraph: {
     title: 'PayLink - Solana Payment Links',
     description: 'Create personalized payment links with your @username. Request SOL payments with ease on Solana.',

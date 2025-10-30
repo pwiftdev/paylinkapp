@@ -537,14 +537,14 @@ function createPointerData(options: Partial<PointerData> & { domElement: HTMLEle
   if (!pointerMap.has(options.domElement)) {
     pointerMap.set(options.domElement, defaultData);
     if (!globalPointerActive) {
-      document.body.addEventListener('pointermove', onPointerMove as EventListener);
-      document.body.addEventListener('pointerleave', onPointerLeave as EventListener);
-      document.body.addEventListener('click', onPointerClick as EventListener);
+      document.body.addEventListener('pointermove', onPointerMove as EventListener, { passive: true } as any);
+      document.body.addEventListener('pointerleave', onPointerLeave as EventListener, { passive: true } as any);
+      document.body.addEventListener('click', onPointerClick as EventListener, { passive: true } as any);
 
-      document.body.addEventListener('touchstart', onTouchStart as EventListener, { passive: false });
-      document.body.addEventListener('touchmove', onTouchMove as EventListener, { passive: false });
-      document.body.addEventListener('touchend', onTouchEnd as EventListener, { passive: false });
-      document.body.addEventListener('touchcancel', onTouchEnd as EventListener, { passive: false });
+      document.body.addEventListener('touchstart', onTouchStart as EventListener, { passive: true } as any);
+      document.body.addEventListener('touchmove', onTouchMove as EventListener, { passive: true } as any);
+      document.body.addEventListener('touchend', onTouchEnd as EventListener, { passive: true } as any);
+      document.body.addEventListener('touchcancel', onTouchEnd as EventListener, { passive: true } as any);
       globalPointerActive = true;
     }
   }
@@ -589,7 +589,7 @@ function processPointerInteraction() {
 
 function onTouchStart(e: TouchEvent) {
   if (e.touches.length > 0) {
-    e.preventDefault();
+    // do not preventDefault so the page can scroll
     pointerPosition.set(e.touches[0].clientX, e.touches[0].clientY);
     for (const [elem, data] of pointerMap) {
       const rect = elem.getBoundingClientRect();
@@ -608,7 +608,7 @@ function onTouchStart(e: TouchEvent) {
 
 function onTouchMove(e: TouchEvent) {
   if (e.touches.length > 0) {
-    e.preventDefault();
+    // do not preventDefault so the page can scroll
     pointerPosition.set(e.touches[0].clientX, e.touches[0].clientY);
     for (const [elem, data] of pointerMap) {
       const rect = elem.getBoundingClientRect();
@@ -797,9 +797,8 @@ function createBallpit(canvas: HTMLCanvasElement, config: any = {}): CreateBallp
   const intersectionPoint = new Vector3();
   let isPaused = false;
 
-  canvas.style.touchAction = 'none';
-  canvas.style.userSelect = 'none';
-  (canvas.style as any).webkitUserSelect = 'none';
+  // Avoid blocking native scrolling and interactions on mobile
+  canvas.style.pointerEvents = 'none';
 
   const pointerData = createPointerData({
     domElement: canvas,

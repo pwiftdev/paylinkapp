@@ -72,7 +72,8 @@ const InfiniteScroll: React.FC<InfiniteScrollProps> = ({
     const observer = Observer.create({
       target: container,
       type: 'wheel,touch,pointer',
-      preventDefault: true,
+      // Do not block native page scrolling
+      preventDefault: false,
       onPress: ({ target }) => {
         (target as HTMLElement).style.cursor = 'grabbing';
       },

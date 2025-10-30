@@ -28,7 +28,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="scroll-smooth">
       <head>
-        <link rel="icon" href="/paylinklogo.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/paylinklogo.png?v=2" />
+        <link rel="apple-touch-icon" href="/paylinklogo.png?v=2" />
+        <meta name="theme-color" content="#5227FF" />
       </head>
       <body className="antialiased">
         <CustomWalletProvider>

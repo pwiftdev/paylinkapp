@@ -1,8 +1,6 @@
 import { auth, db, storage } from "./firebase";
 import {
   signOut,
-  GoogleAuthProvider,
-  signInWithPopup,
 } from "firebase/auth";
 import {
   collection,
@@ -16,17 +14,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Auth functions
 export const logoutUser = () => signOut(auth);
-
-export const signInWithGoogle = async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    const result = await signInWithPopup(auth, provider);
-    return result.user;
-  } catch (error) {
-    console.error("Error signing in with Google", error);
-    throw error;
-  }
-};
 
 // Firestore functions
 export const addDocument = (collectionName: string, data: any) =>

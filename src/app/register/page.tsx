@@ -13,11 +13,19 @@ export default function RegisterPage() {
   const { publicKey } = useWallet();
   const { setVisible } = useWalletModal();
   const [username, setUsername] = useState('');
+  const [referrerUsername, setReferrerUsername] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checkingExisting, setCheckingExisting] = useState(true);
 
   useEffect(() => {
+    // Check for referrer in URL
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref');
+    if (refParam) {
+      setReferrerUsername(refParam.toLowerCase());
+    }
+
     const checkExistingUser = async () => {
       if (!publicKey) {
         setCheckingExisting(false);
@@ -58,6 +66,7 @@ export default function RegisterPage() {
         body: JSON.stringify({
           username,
           wallet: publicKey.toString(),
+          referrer_username: referrerUsername.trim() || null,
         }),
       });
 
@@ -223,6 +232,37 @@ export default function RegisterPage() {
                   <p className="mt-2 text-sm text-red-300">Invalid username format</p>
                 )}
               </div>
+
+              {/* Referrer Username Field */}
+              {publicKey && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-lg flex items-center justify-center">
+                        <FaUser className="text-blue-300 text-sm" />
+                      </div>
+                      <span>Referred By (Optional)</span>
+                    </div>
+                  </label>
+                  <div className="flex items-center">
+                    <span className="text-gray-400 mr-3 text-xl font-medium">@</span>
+                    <input
+                      type="text"
+                      value={referrerUsername}
+                      onChange={(e) => setReferrerUsername(e.target.value.toLowerCase())}
+                      placeholder="username"
+                      className="flex-1 px-4 py-4 border border-white/30 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 text-lg placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
+                      maxLength={20}
+                    />
+                  </div>
+                  <p className="mt-3 text-sm text-gray-400">
+                    Enter the username of the person who referred you
+                  </p>
+                  {referrerUsername && referrerUsername.toLowerCase() === username.toLowerCase() && (
+                    <p className="mt-2 text-sm text-red-300">You cannot refer yourself</p>
+                  )}
+                </div>
+              )}
 
               {error && (
                 <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 backdrop-blur-sm">

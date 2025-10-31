@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaPlus, FaLink, FaSignOutAlt, FaSpinner, FaCopy, FaExternalLinkAlt, FaCalendarAlt, FaWallet, FaChartLine, FaCheckCircle, FaArrowRight, FaEllipsisV, FaCoins } from 'react-icons/fa';
+import { FaPlus, FaLink, FaSignOutAlt, FaSpinner, FaCopy, FaExternalLinkAlt, FaCalendarAlt, FaWallet, FaChartLine, FaCheckCircle, FaArrowRight, FaEllipsisV, FaCoins, FaUsers, FaTrophy, FaMedal, FaShareAlt } from 'react-icons/fa';
 
 interface UserData {
   id: string;
@@ -25,6 +25,23 @@ interface LinkData {
   created_at: string;
 }
 
+interface ReferralStats {
+  username: string;
+  totalReferrals: number;
+  verifiedReferrals: number;
+  points: number;
+  rank: number | null;
+  totalReferrers: number;
+}
+
+interface LeaderboardEntry {
+  rank: number;
+  username: string;
+  totalReferrals: number;
+  verifiedReferrals: number;
+  points: number;
+}
+
 export default function DashboardPage() {
   const router = useRouter();
   const { publicKey, disconnect } = useWallet();
@@ -35,8 +52,11 @@ export default function DashboardPage() {
   const [copied, setCopied] = useState<string | null>(null);
   const [balance, setBalance] = useState<number | null>(null);
   const [balanceLoading, setBalanceLoading] = useState(false);
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [loadingStats, setLoadingStats] = useState(false);
 
-  const fetchBalance = async () => {
+  const fetchBalance = useCallback(async () => {
     if (!publicKey || !connection) return;
     
     setBalanceLoading(true);
@@ -48,7 +68,7 @@ export default function DashboardPage() {
     } finally {
       setBalanceLoading(false);
     }
-  };
+  }, [publicKey, connection]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -71,6 +91,20 @@ export default function DashboardPage() {
           const linksData = await linksResponse.json();
           setLinks(linksData);
         }
+
+        // Fetch referral stats
+        const statsResponse = await fetch(`/api/referrals/stats?username=${data.username}`);
+        if (statsResponse.ok) {
+          const statsData = await statsResponse.json();
+          setReferralStats(statsData);
+        }
+
+        // Fetch leaderboard
+        const leaderboardResponse = await fetch('/api/referrals/leaderboard?limit=10');
+        if (leaderboardResponse.ok) {
+          const leaderboardData = await leaderboardResponse.json();
+          setLeaderboard(leaderboardData);
+        }
       } catch (error) {
         console.error('Failed to fetch user:', error);
       } finally {
@@ -80,7 +114,7 @@ export default function DashboardPage() {
 
     fetchUser();
     fetchBalance();
-  }, [publicKey, router, connection]);
+  }, [publicKey, router, connection, fetchBalance]);
 
   if (loading) {
     return (
@@ -257,6 +291,97 @@ export default function DashboardPage() {
           </div>
         </div>
 
+        {/* Referral Stats Section */}
+        {referralStats && (
+          <div className="mb-12">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl overflow-hidden">
+              <div className="px-8 py-6 border-b border-white/20 bg-gradient-to-r from-purple-500/10 to-pink-500/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-light text-white mb-2 flex items-center gap-3">
+                      <FaTrophy className="text-yellow-400" />
+                      Referral Program
+                    </h2>
+                    <p className="text-gray-300">
+                      Invite friends and earn rewards. Every verified referral = bonus points!
+                    </p>
+                  </div>
+                  {referralStats.rank && (
+                    <div className="text-center">
+                      <div className="text-3xl font-light text-white mb-1">
+                        #{referralStats.rank}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        of {referralStats.totalReferrers} referrers
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="p-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <FaUsers className="text-blue-400 text-xl" />
+                      <span className="text-gray-300 font-medium">Total Referrals</span>
+                    </div>
+                    <div className="text-3xl font-light text-white">{referralStats.totalReferrals}</div>
+                    <div className="text-xs text-gray-400 mt-2">All users you referred</div>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <FaCheckCircle className="text-green-400 text-xl" />
+                      <span className="text-gray-300 font-medium">Verified</span>
+                    </div>
+                    <div className="text-3xl font-light text-white">{referralStats.verifiedReferrals}</div>
+                    <div className="text-xs text-gray-400 mt-2">Have made a paid transaction</div>
+                  </div>
+                  <div className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center gap-3 mb-3">
+                      <FaMedal className="text-yellow-400 text-xl" />
+                      <span className="text-gray-300 font-medium">Points</span>
+                    </div>
+                    <div className="text-3xl font-light text-white">{referralStats.points}</div>
+                    <div className="text-xs text-gray-400 mt-2">1 per referral + 2 per verified</div>
+                  </div>
+                </div>
+                <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-xl p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h3 className="text-white font-medium mb-2 flex items-center gap-2">
+                        <FaShareAlt className="text-sm" />
+                        Share Your Referral Link
+                      </h3>
+                      <p className="text-gray-300 text-sm mb-3">
+                        Share this link with friends: <code className="bg-white/20 px-2 py-1 rounded text-xs break-all">{typeof window !== 'undefined' ? `${window.location.origin}/register?ref=${user.username}` : `/register?ref=${user.username}`}</code>
+                      </p>
+                      <p className="text-gray-400 text-xs">
+                        Or tell them to enter <strong className="text-purple-300">@{user.username}</strong> when signing up
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => copyToClipboard(`${window.location.origin}/register?ref=${user.username}`)}
+                      className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-all font-medium text-white flex items-center gap-2"
+                    >
+                      {copied === `${window.location.origin}/register?ref=${user.username}` ? (
+                        <>
+                          <FaCheckCircle className="text-green-400" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <FaCopy />
+                          Copy Link
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Links Section */}
         <div>
           <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
@@ -397,6 +522,68 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
+
+        {/* Leaderboard Section */}
+        {leaderboard.length > 0 && (
+          <div className="mt-12 mb-12">
+            <div className="bg-white/10 backdrop-blur-md rounded-2xl border border-white/20 shadow-xl">
+              <div className="px-8 py-6 border-b border-white/20">
+                <h2 className="text-2xl font-light text-white mb-2 flex items-center gap-3">
+                  <FaTrophy className="text-yellow-400" />
+                  Top Referrers
+                </h2>
+                <p className="text-gray-300 text-sm">
+                  Monthly leaderboard ranking based on referral points
+                </p>
+              </div>
+              <div className="p-8">
+                <div className="space-y-3">
+                  {leaderboard.map((entry) => (
+                    <div
+                      key={entry.username}
+                      className={`flex items-center gap-4 p-4 rounded-xl border backdrop-blur-sm transition-all ${
+                        entry.username.toLowerCase() === user.username.toLowerCase()
+                          ? 'bg-gradient-to-r from-purple-500/30 to-pink-500/30 border-purple-400/50 shadow-lg'
+                          : 'bg-white/5 border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white ${
+                        entry.rank === 1
+                          ? 'bg-gradient-to-br from-yellow-400 to-yellow-600'
+                          : entry.rank === 2
+                          ? 'bg-gradient-to-br from-gray-300 to-gray-500'
+                          : entry.rank === 3
+                          ? 'bg-gradient-to-br from-amber-600 to-amber-800'
+                          : 'bg-gradient-to-br from-purple-500 to-purple-700'
+                      }`}>
+                        {entry.rank <= 3 ? (
+                          entry.rank === 1 ? '🥇' : entry.rank === 2 ? '🥈' : '🥉'
+                        ) : (
+                          entry.rank
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-white">@{entry.username}</span>
+                          {entry.username.toLowerCase() === user.username.toLowerCase() && (
+                            <span className="text-xs bg-purple-500/30 text-purple-200 px-2 py-0.5 rounded">You</span>
+                          )}
+                        </div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {entry.totalReferrals} referrals • {entry.verifiedReferrals} verified
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-xl font-light text-white">{entry.points}</div>
+                        <div className="text-xs text-gray-400">points</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </main>
   );

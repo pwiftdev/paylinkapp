@@ -8,7 +8,7 @@ export const runtime = 'nodejs';
 // POST /api/users - Create or get user account
 export async function POST(request: NextRequest) {
   try {
-    const { username, wallet } = await request.json();
+    const { username, wallet, referrer_username } = await request.json();
 
     // Validation
     if (!username || !wallet) {
@@ -26,6 +26,37 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate referrer username if provided
+    if (referrer_username) {
+      if (!/^[a-zA-Z0-9_]{3,20}$/.test(referrer_username)) {
+        return NextResponse.json(
+          { error: 'Invalid referrer username format' },
+          { status: 400 }
+        );
+      }
+      
+      if (referrer_username.toLowerCase() === username.toLowerCase()) {
+        return NextResponse.json(
+          { error: 'You cannot refer yourself' },
+          { status: 400 }
+        );
+      }
+
+      // Check if referrer exists
+      const { data: referrer } = await supabase
+        .from('users')
+        .select('username')
+        .eq('username', referrer_username.toLowerCase())
+        .single();
+
+      if (!referrer) {
+        return NextResponse.json(
+          { error: 'Referrer username not found' },
+          { status: 400 }
+        );
+      }
+    }
+
     // Check if user already exists
     const { data: existingUser } = await supabase
       .from('users')
@@ -38,6 +69,7 @@ export async function POST(request: NextRequest) {
         id: existingUser.id,
         username: existingUser.username,
         wallet: existingUser.wallet,
+        referrer_username: existingUser.referrer_username,
         isNew: false,
       });
     }
@@ -62,8 +94,9 @@ export async function POST(request: NextRequest) {
       .from('users')
       .insert({
         id,
-        username,
+        username: username.toLowerCase(),
         wallet,
+        referrer_username: referrer_username ? referrer_username.toLowerCase() : null,
       })
       .select()
       .single();
@@ -80,6 +113,7 @@ export async function POST(request: NextRequest) {
       id: data.id,
       username: data.username,
       wallet: data.wallet,
+      referrer_username: data.referrer_username,
       isNew: true,
     });
   } catch (error) {

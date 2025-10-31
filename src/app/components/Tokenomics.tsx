@@ -6,7 +6,7 @@ import DotGrid from '@/components/DotGrid'
 const Tokenomics = () => {
   const tokenomics = {
     supply: '1,000,000,000',
-    symbol: '$PAYL'
+    symbol: '$LINK'
   }
 
   return (

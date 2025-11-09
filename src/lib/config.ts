@@ -10,4 +10,4 @@ export const SOLANA_RPC_ENDPOINT = (process.env.NEXT_PUBLIC_SOLANA_RPC || 'https
 
 // Feature flags
 // Set to true to lock the app before TGE, false to unlock after TGE
-export const LOCKED_BEFORE_TGE = true;
+export const LOCKED_BEFORE_TGE = false;

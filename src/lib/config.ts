@@ -7,3 +7,7 @@ export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 // Prefer env vars so we can point to a managed RPC (e.g., Tatum) in production
 export const SOLANA_NETWORK = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || 'mainnet-beta') as string;
 export const SOLANA_RPC_ENDPOINT = (process.env.NEXT_PUBLIC_SOLANA_RPC || '') as string; // optional override
+
+// Feature flags
+// Set to true to lock the app before TGE, false to unlock after TGE
+export const LOCKED_BEFORE_TGE = true;

@@ -1,8 +1,14 @@
 'use client';
 
 import Image from 'next/image';
+import { LOCKED_BEFORE_TGE } from '@/lib/config';
 
 export default function LockedOverlay() {
+  // If the app is unlocked, don't render the overlay
+  if (!LOCKED_BEFORE_TGE) {
+    return null;
+  }
+
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center pointer-events-auto">
       {/* Glass overlay with blur effect */}

@@ -6,6 +6,7 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaArrowLeft, FaUser, FaWallet, FaDollarSign, FaComment, FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import LockedOverlay from '../components/LockedOverlay';
 
 interface UserData {
   id: string;
@@ -335,6 +336,7 @@ export default function CreateLinkPage() {
           )}
         </div>
       </div>
+      <LockedOverlay />
     </main>
   );
 }

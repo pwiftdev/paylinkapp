@@ -7,6 +7,7 @@ import { useWalletModal } from '@solana/wallet-adapter-react-ui';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaWallet, FaUser, FaArrowLeft, FaCheckCircle, FaSpinner } from 'react-icons/fa';
+import LockedOverlay from '../components/LockedOverlay';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -311,6 +312,7 @@ export default function RegisterPage() {
           </p>
         </div>
       </div>
+      <LockedOverlay />
     </main>
   );
 }

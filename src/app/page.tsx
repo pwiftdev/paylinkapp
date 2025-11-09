@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle, FaUsers, FaTrophy, FaMedal, FaShareAlt, FaGift, FaBars, FaTimes } from 'react-icons/fa';
+import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle, FaUsers, FaTrophy, FaMedal, FaShareAlt, FaGift, FaBars, FaTimes, FaCoins } from 'react-icons/fa';
 import Tokenomics from './components/Tokenomics';
 import { useEffect, useState } from 'react';
 import CountUp from '@/components/CountUp';
@@ -263,6 +263,14 @@ export default function Home() {
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-delay-2">
+            <Link
+              href="/presale"
+              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all font-semibold text-lg shadow-xl flex items-center gap-2 hover:scale-105 hover:shadow-2xl group"
+            >
+              <FaCoins className="text-lg" />
+              Join Presale
+              <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
+            </Link>
             <Link
               href="/register"
               className="px-8 py-4 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition-all font-semibold text-lg shadow-xl flex items-center gap-2 hover:scale-105 hover:shadow-2xl group"

@@ -332,7 +332,7 @@ export default function CreateLinkPage() {
                       />
                     </div>
                     <p className="text-xs text-gray-400">
-                      Create a memorable URL like "paylink.app/link/my-custom-link". Leave empty for a random ID.
+                      Create a memorable URL like &quot;paylink.app/link/my-custom-link&quot;. Leave empty for a random ID.
                     </p>
                     {customSlug && !isValidSlug && (
                       <p className="mt-2 text-sm text-red-300 flex items-center">

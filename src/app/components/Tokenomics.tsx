@@ -1,13 +1,12 @@
 'use client'
 
 import { FaCoins, FaLock, FaUsers, FaRocket, FaFire } from 'react-icons/fa'
-import DotGrid from '@/components/DotGrid'
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Pie } from 'react-chartjs-2'
-
-ChartJS.register(ArcElement, Tooltip, Legend)
+import Aurora from '@/components/Aurora'
+import { useState, useEffect } from 'react'
 
 const Tokenomics = () => {
+  const [animatedPercentages, setAnimatedPercentages] = useState<number[]>([0, 0, 0, 0]);
+  
   const tokenomics = {
     supply: '1,000,000,000',
     symbol: '$LINK'
@@ -23,23 +22,23 @@ const Tokenomics = () => {
       icon: FaFire
     },
     { 
-      label: 'Public Presale', 
-      percentage: 15, 
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-100',
-      textColor: 'text-blue-700',
-      icon: FaUsers
-    },
-    { 
       label: 'PayLink Utility (Locked)', 
-      percentage: 12.5, 
+      percentage: 20, 
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-100',
       textColor: 'text-green-700',
       icon: FaLock
     },
     { 
-      label: 'Development Team', 
+      label: 'Marketing and Partnerships (Vested)', 
+      percentage: 7.5, 
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-100',
+      textColor: 'text-blue-700',
+      icon: FaUsers
+    },
+    { 
+      label: 'Development Team (Vested)', 
       percentage: 2.5, 
       color: 'from-amber-500 to-amber-600',
       bgColor: 'bg-amber-100',
@@ -48,20 +47,49 @@ const Tokenomics = () => {
     },
   ]
 
+  useEffect(() => {
+    // Animate percentages on mount
+    const duration = 1500;
+    const steps = 60;
+    const interval = duration / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      const progress = currentStep / steps;
+      const easeOut = 1 - Math.pow(1 - progress, 3); // Ease out cubic
+      
+      setAnimatedPercentages(
+        distribution.map(item => item.percentage * easeOut)
+      );
+
+      if (currentStep >= steps) {
+        clearInterval(timer);
+        setAnimatedPercentages(distribution.map(item => item.percentage));
+      }
+    }, interval);
+
+    return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <section className="px-4 relative overflow-hidden pt-12 pb-8 md:py-16 bg-[#3a3f4f]">
-      {/* Background interactive dot grid (full section) */}
-      <div className="absolute inset-0 z-0 pointer-events-none" style={{ backgroundColor: '#3a3f4f' }}>
-        <DotGrid
-          dotSize={5}
-          gap={15}
-          baseColor="#5227FF"
-          activeColor="#5227FF"
-          proximity={120}
-          shockRadius={250}
-          shockStrength={5}
-          resistance={750}
-          returnDuration={1.5}
+    <section className="px-4 relative overflow-hidden pt-12 pb-8 md:py-16 bg-black">
+      {/* Aurora Background - Top */}
+      <div className="absolute inset-0 z-0 w-full h-full">
+        <Aurora 
+          colorStops={['#5227FF', '#9333ea', '#5227FF']}
+          amplitude={1.0}
+          blend={0.5}
+        />
+      </div>
+      {/* Aurora Background - Bottom (Different Animation Style) */}
+      <div className="absolute inset-0 z-0 w-full h-full" style={{ transform: 'scaleY(-1)' }}>
+        <Aurora 
+          colorStops={['#9333ea', '#5227FF', '#9333ea']}
+          amplitude={1.3}
+          blend={0.6}
+          speed={1.5}
         />
       </div>
       <div className="max-w-6xl mx-auto relative z-10">
@@ -80,77 +108,74 @@ const Tokenomics = () => {
 
         <div className="flex flex-col gap-8 mb-8 max-w-3xl mx-auto">
           {/* Token Details */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 hover:scale-105 animate-fade-in-up-delay">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-6 text-center">Token Details</h3>
-            <div className="space-y-4">
-              <div className="flex justify-between items-center border-b border-gray-100 pb-3 group">
-                <span className="text-gray-600 group-hover:text-purple-600 transition-colors">Total Supply</span>
-                <span className="font-bold text-gray-900 group-hover:scale-110 transition-transform inline-block">{tokenomics.supply}</span>
-              </div>
-              <div className="flex justify-between items-center border-b border-gray-100 pb-3 group">
-                <span className="text-gray-600 group-hover:text-purple-600 transition-colors">Network</span>
-                <span className="font-bold text-gray-900 group-hover:scale-110 transition-transform inline-block">Solana</span>
-              </div>
-              <div className="flex justify-between items-center group">
-                <span className="text-gray-600 group-hover:text-purple-600 transition-colors">Launch Platform</span>
-                <span className="font-bold text-gray-900 group-hover:scale-110 transition-transform inline-block">PumpFun</span>
+          <div className="relative rounded-3xl p-8 backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 animate-fade-in-up-delay overflow-hidden group">
+            {/* Liquid glass gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+            {/* Shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center drop-shadow-lg">Token Details</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center border-b border-white/20 pb-3 hover:border-purple-400/30 transition-colors">
+                  <span className="text-gray-200 hover:text-purple-300 transition-colors">Total Supply</span>
+                  <span className="font-bold text-white hover:scale-110 transition-transform inline-block drop-shadow-md">{tokenomics.supply}</span>
+                </div>
+                <div className="flex justify-between items-center border-b border-white/20 pb-3 hover:border-purple-400/30 transition-colors">
+                  <span className="text-gray-200 hover:text-purple-300 transition-colors">Network</span>
+                  <span className="font-bold text-white hover:scale-110 transition-transform inline-block drop-shadow-md">Solana</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-200 hover:text-purple-300 transition-colors">Launch Platform</span>
+                  <span className="font-bold text-white hover:scale-110 transition-transform inline-block drop-shadow-md">PumpFun</span>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Token Distribution */}
-          <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 animate-fade-in-up-delay-2">
-            <h3 className="text-2xl font-semibold text-gray-900 mb-8 text-center">Token Distribution</h3>
-            
-            {/* Chart.js Pie Chart */}
-            <div className="flex flex-col items-center gap-8">
-              <div className="w-full max-w-md mx-auto">
-                <Pie
-                  data={{
-                    labels: distribution.map(d => d.label),
-                    datasets: [{
-                      data: distribution.map(d => d.percentage),
-                      backgroundColor: [
-                        '#9333ea', // purple
-                        '#3b82f6', // blue
-                        '#22c55e', // green
-                        '#f59e0b', // amber
-                      ],
-                      borderColor: '#ffffff',
-                      borderWidth: 2,
-                    }]
-                  }}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                      legend: {
-                        display: false,
-                      },
-                      tooltip: {
-                        callbacks: {
-                          label: function(context) {
-                            return `${context.label}: ${context.parsed}%`;
-                          }
-                        }
-                      }
-                    }
-                  }}
-                />
-              </div>
+          <div className="relative rounded-3xl p-8 backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:shadow-2xl hover:shadow-purple-500/20 animate-fade-in-up-delay-2 overflow-hidden group">
+            {/* Liquid glass gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 opacity-50 group-hover:opacity-75 transition-opacity duration-300"></div>
+            {/* Shine effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-semibold text-white mb-6 text-center drop-shadow-lg">Token Distribution</h3>
               
-              {/* Legend Below */}
-              <div className="w-full max-w-2xl grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Compact Progress Bars */}
+              <div className="space-y-4">
                 {distribution.map((item, index) => {
                   const Icon = item.icon;
-                  const colors = ['bg-purple-600', 'bg-blue-600', 'bg-green-600', 'bg-amber-600'];
+                  const colors = [
+                    { bg: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600', text: 'text-purple-300' },
+                    { bg: 'bg-green-500', gradient: 'from-green-500 to-green-600', text: 'text-green-300' },
+                    { bg: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600', text: 'text-blue-300' },
+                    { bg: 'bg-amber-500', gradient: 'from-amber-500 to-amber-600', text: 'text-amber-300' },
+                  ];
+                  const color = colors[index];
+                  const animatedWidth = animatedPercentages[index] || 0;
                   
                   return (
-                    <div key={index} className="flex items-center gap-3 group">
-                      <div className={`w-4 h-4 rounded ${colors[index]}`} />
-                      <Icon className="text-gray-600 text-sm" />
-                      <span className="text-gray-700 font-medium text-sm flex-1">{item.label}</span>
-                      <span className="font-bold text-gray-900">{item.percentage}%</span>
+                    <div key={index} className="group">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${color.gradient} flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                            <Icon className="text-white text-sm" />
+                          </div>
+                          <div>
+                            <span className="text-white font-semibold text-sm block">{item.label}</span>
+                            <span className={`${color.text} text-xs font-medium`}>{item.percentage}%</span>
+                          </div>
+                        </div>
+                        <span className="text-white font-bold text-lg drop-shadow-md">{item.percentage}%</span>
+                      </div>
+                      <div className="relative h-3 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm border border-white/10">
+                        <div
+                          className={`h-full bg-gradient-to-r ${color.gradient} rounded-full shadow-lg transition-all duration-300 ease-out relative overflow-hidden`}
+                          style={{ width: `${animatedWidth}%` }}
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer"></div>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -160,27 +185,6 @@ const Tokenomics = () => {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .animate-fade-in-up {
-          animation: fade-in-up 0.8s ease-out;
-        }
-        .animate-fade-in-up-delay {
-          animation: fade-in-up 0.8s ease-out 0.3s both;
-        }
-        .animate-fade-in-up-delay-2 {
-          animation: fade-in-up 0.8s ease-out 0.5s both;
-        }
-      `}</style>
     </section>
   )
 }

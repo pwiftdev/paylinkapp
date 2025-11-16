@@ -2,12 +2,10 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle, FaUsers, FaTrophy, FaMedal, FaShareAlt, FaGift, FaBars, FaTimes, FaCoins } from 'react-icons/fa';
+import { FaUser, FaLink, FaBolt, FaShieldAlt, FaGlobe, FaMobile, FaArrowRight, FaCheckCircle, FaUsers, FaTrophy, FaMedal, FaShareAlt, FaGift, FaBars, FaTimes } from 'react-icons/fa';
 import Tokenomics from './components/Tokenomics';
 import { useEffect, useState } from 'react';
 import CountUp from '@/components/CountUp';
-import Ballpit from '@/components/Ballpit';
-import InfiniteScroll from '@/components/InfiniteScroll';
 import GlassSurface from '@/components/GlassSurface';
 
 export default function Home() {
@@ -264,14 +262,6 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-16 animate-fade-in-delay-2">
             <Link
-              href="/presale"
-              className="px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all font-semibold text-lg shadow-xl flex items-center gap-2 hover:scale-105 hover:shadow-2xl group"
-            >
-              <FaCoins className="text-lg" />
-              Join Presale
-              <FaArrowRight className="text-sm group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
               href="/register"
               className="px-8 py-4 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition-all font-semibold text-lg shadow-xl flex items-center gap-2 hover:scale-105 hover:shadow-2xl group"
             >
@@ -314,70 +304,180 @@ export default function Home() {
       
 
       {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-gray-50 relative overflow-hidden min-h-[500px] scroll-mt-20">
-        {/* Ballpit Background */}
-        <div className="absolute inset-0">
-          <Ballpit
-            count={50}
-            gravity={1}
-            friction={0.99}
-            wallBounce={0.95}
-            followCursor={true}
-            colors={[0x5b21b6, 0x7c3aed, 0xa855f7, 0xc084fc]}
-          />
+      <section id="features" className="py-20 px-4 bg-gradient-to-b from-gray-900 via-purple-900/50 to-gray-900 relative overflow-hidden scroll-mt-20">
+        {/* Animated gradient background */}
+        <div className="absolute inset-0 opacity-40">
+          <div 
+            className="absolute top-0 left-1/4 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"
+            style={{
+              animation: 'blob 7s infinite',
+            }}
+          ></div>
+          <div 
+            className="absolute top-0 right-1/4 w-96 h-96 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl"
+            style={{
+              animation: 'blob 7s infinite 2s',
+            }}
+          ></div>
+          <div 
+            className="absolute bottom-0 left-1/3 w-96 h-96 bg-purple-600 rounded-full mix-blend-multiply filter blur-3xl"
+            style={{
+              animation: 'blob 7s infinite 4s',
+            }}
+          ></div>
         </div>
-        <div className="max-w-6xl mx-auto relative z-10">
+        
+        <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Why Choose PayLink?</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 drop-shadow-lg">Why Choose PayLink?</h2>
+            <p className="text-xl text-gray-200 max-w-3xl mx-auto">
               The simplest way to request and receive SOL payments with personalized links
             </p>
           </div>
 
-          {/* Infinite Scroll stack replacing grid */}
-          <div className="relative flex justify-center" style={{ height: '500px' }}>
-            {(() => {
-              const colorClassMap: Record<string, string> = {
-                purple: 'text-purple-600',
-                blue: 'text-blue-600',
-                green: 'text-green-600',
-                pink: 'text-pink-600',
-                indigo: 'text-indigo-600',
-                yellow: 'text-yellow-600',
-              };
-              const data = [
-                { icon: FaShieldAlt, color: 'purple', title: 'Secure & Trustless', desc: 'Built on Solana blockchain with no central authority. Your funds are always in your control.' },
-                { icon: FaGlobe, color: 'blue', title: 'Global & Instant', desc: 'Send and receive payments anywhere in the world in seconds with minimal fees.' },
-                { icon: FaMobile, color: 'green', title: 'Mobile First', desc: 'Optimized for mobile devices. Perfect for on-the-go payments and requests.' },
-                { icon: FaUser, color: 'pink', title: 'Personal Branding', desc: 'Create your unique @username and build your payment identity on Solana.' },
-                { icon: FaLink, color: 'indigo', title: 'Easy Sharing', desc: 'Generate shareable links with pre-filled payment details for seamless transactions.' },
-                { icon: FaBolt, color: 'yellow', title: 'Lightning Fast', desc: "Solana's high throughput ensures instant confirmations and low transaction costs." },
-              ];
-              const items = data.map(({ icon: Icon, color, title, desc }) => ({
-                content: (
-                  <div className="bg-white/90 backdrop-blur rounded-xl p-5 md:p-6 shadow-sm border border-gray-100 hover:shadow-xl transition-all duration-300 group">
-                    <Icon className={`text-3xl ${colorClassMap[color]} mb-3 md:mb-4`} />
-                    <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2 md:mb-3">{title}</h3>
-                    <p className="text-sm md:text-base text-gray-600">{desc}</p>
-                  </div>
-                )
-              }));
+          {/* Liquid Glass Grid Layout */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[
+              { 
+                icon: FaShieldAlt, 
+                gradient: 'from-purple-500 to-purple-600',
+                title: 'Secure & Trustless', 
+                desc: 'Built on Solana blockchain with no central authority. Your funds are always in your control.' 
+              },
+              { 
+                icon: FaUser, 
+                gradient: 'from-pink-500 to-pink-600',
+                title: 'Personal Branding', 
+                desc: 'Create your unique @username and build your payment identity on Solana.' 
+              },
+              { 
+                icon: FaLink, 
+                gradient: 'from-indigo-500 to-indigo-600',
+                title: 'Easy Sharing', 
+                desc: 'Generate shareable links with pre-filled payment details for seamless transactions.' 
+              },
+              { 
+                icon: FaBolt, 
+                gradient: 'from-yellow-500 to-yellow-600',
+                title: 'Lightning Fast', 
+                desc: "Solana's high throughput ensures instant confirmations and low transaction costs." 
+              },
+            ].map((feature, index) => {
+              const Icon = feature.icon;
               return (
-                <InfiniteScroll
-                  items={items}
-                  isTilted={true}
-                  tiltDirection="left"
-                  autoplay={true}
-                  autoplaySpeed={0.2}
-                  autoplayDirection="down"
-                  pauseOnHover={true}
-                  width="28rem"
-                  maxHeight="100%"
-                  negativeMargin="-0.75em"
-                  itemMinHeight={140}
-                />
+                <div
+                  key={index}
+                  className="group relative rounded-3xl p-6 md:p-8 backdrop-blur-xl bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/20 overflow-hidden"
+                >
+                  {/* Liquid glass gradient overlay */}
+                  <div className={`absolute inset-0 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                  
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                  
+                  {/* Icon container */}
+                  <div className="relative z-10 mb-4">
+                    <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br ${feature.gradient} text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-all duration-300`}>
+                      <Icon className="text-2xl" />
+                    </div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="relative z-10">
+                    <h3 className="text-xl font-bold text-white mb-3 drop-shadow-md group-hover:text-purple-200 transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-gray-200 leading-relaxed group-hover:text-white transition-colors">
+                      {feature.desc}
+                    </p>
+                  </div>
+                  
+                  {/* Decorative corner accent */}
+                  <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${feature.gradient} opacity-0 group-hover:opacity-20 rounded-bl-full transition-opacity duration-300`}></div>
+                </div>
               );
-            })()}
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Section - Bubbles */}
+      <section className="py-24 px-4 bg-gradient-to-b from-white via-purple-50/30 to-white relative overflow-hidden">
+        {/* Floating background bubbles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-20 left-10 w-32 h-32 bg-purple-200/40 rounded-full blur-2xl animate-float" style={{ animationDelay: '0s' }}></div>
+          <div className="absolute top-40 right-20 w-24 h-24 bg-blue-200/40 rounded-full blur-2xl animate-float" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute bottom-20 left-1/4 w-40 h-40 bg-pink-200/40 rounded-full blur-2xl animate-float" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute bottom-40 right-1/3 w-28 h-28 bg-purple-200/40 rounded-full blur-2xl animate-float" style={{ animationDelay: '1.5s' }}></div>
+        </div>
+        
+        <div className="max-w-6xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">PayLink by the Numbers</h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">Live stats from our growing community</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-8 md:gap-12">
+            {/* Users Bubble */}
+            <div 
+              className="group relative w-64 h-64 rounded-full bg-gradient-to-br from-purple-400 via-purple-500 to-purple-600 shadow-2xl shadow-purple-500/30 flex flex-col items-center justify-center hover:scale-110 transition-all duration-500 hover:shadow-purple-500/50"
+            >
+              {/* Bubble highlight */}
+              <div className="absolute top-8 left-12 w-16 h-16 bg-white/30 rounded-full blur-xl"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 text-center">
+                <div className="mb-3">
+                  <FaUsers className="text-white text-3xl mx-auto drop-shadow-lg" />
+                </div>
+                <div className="text-white/90 text-sm uppercase tracking-wider font-semibold mb-2">Users</div>
+                <CountUp
+                  end={loadingStats ? 0 : stats?.users ?? 0}
+                  className="text-4xl font-extrabold text-white drop-shadow-lg"
+                />
+              </div>
+            </div>
+
+            {/* Links Created Bubble */}
+            <div 
+              className="group relative w-64 h-64 rounded-full bg-gradient-to-br from-indigo-400 via-indigo-500 to-indigo-600 shadow-2xl shadow-indigo-500/30 flex flex-col items-center justify-center hover:scale-110 transition-all duration-500 hover:shadow-indigo-500/50"
+            >
+              {/* Bubble highlight */}
+              <div className="absolute top-8 left-12 w-16 h-16 bg-white/30 rounded-full blur-xl"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 text-center">
+                <div className="mb-3">
+                  <FaLink className="text-white text-3xl mx-auto drop-shadow-lg" />
+                </div>
+                <div className="text-white/90 text-sm uppercase tracking-wider font-semibold mb-2">Links Created</div>
+                <CountUp
+                  end={loadingStats ? 0 : stats?.links ?? 0}
+                  className="text-4xl font-extrabold text-white drop-shadow-lg"
+                />
+              </div>
+            </div>
+
+            {/* Total SOL Requested Bubble */}
+            <div 
+              className="group relative w-64 h-64 rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-amber-600 shadow-2xl shadow-amber-500/30 flex flex-col items-center justify-center hover:scale-110 transition-all duration-500 hover:shadow-amber-500/50"
+            >
+              {/* Bubble highlight */}
+              <div className="absolute top-8 left-12 w-16 h-16 bg-white/30 rounded-full blur-xl"></div>
+              
+              {/* Content */}
+              <div className="relative z-10 text-center">
+                <div className="mb-3">
+                  <FaBolt className="text-white text-3xl mx-auto drop-shadow-lg" />
+                </div>
+                <div className="text-white/90 text-sm uppercase tracking-wider font-semibold mb-2">Total SOL</div>
+                <CountUp
+                  end={loadingStats ? 0 : stats?.totalRequestedSol ?? 0}
+                  decimals={2}
+                  className="text-4xl font-extrabold text-white drop-shadow-lg"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -573,41 +673,6 @@ export default function Home() {
               Get Started
               <FaArrowRight className="text-sm" />
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section (Last) */}
-      <section className="py-16 px-4 bg-white border-t border-gray-100">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900 mb-3">PayLink by the Numbers</h2>
-            <p className="text-gray-600">Live stats from our community</p>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
-              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Users</div>
-              <CountUp
-                end={loadingStats ? 0 : stats?.users ?? 0}
-                className="text-4xl font-extrabold text-gray-900"
-              />
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
-              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Links Created</div>
-              <CountUp
-                end={loadingStats ? 0 : stats?.links ?? 0}
-                className="text-4xl font-extrabold text-gray-900"
-              />
-            </div>
-            <div className="rounded-xl border border-gray-200 p-6 text-center bg-gray-50">
-              <div className="text-sm uppercase tracking-wide text-gray-500 mb-2">Total SOL Requested</div>
-              <CountUp
-                end={loadingStats ? 0 : stats?.totalRequestedSol ?? 0}
-                decimals={2}
-                suffix=" SOL"
-                className="text-4xl font-extrabold text-gray-900"
-              />
-            </div>
           </div>
         </div>
       </section>

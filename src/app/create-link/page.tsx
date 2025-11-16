@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FaArrowLeft, FaUser, FaWallet, FaDollarSign, FaComment, FaSpinner, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaArrowLeft, FaUser, FaWallet, FaDollarSign, FaComment, FaSpinner, FaCheckCircle, FaExclamationTriangle, FaLink } from 'react-icons/fa';
 import LockedOverlay from '../components/LockedOverlay';
 
 interface UserData {
@@ -21,6 +21,7 @@ export default function CreateLinkPage() {
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
   const [message, setMessage] = useState('');
+  const [customSlug, setCustomSlug] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [userLoading, setUserLoading] = useState(true);
@@ -70,6 +71,7 @@ export default function CreateLinkPage() {
           recipient,
           amount,
           message: message || null,
+          customSlug: customSlug.trim() || null,
         }),
       });
 
@@ -78,8 +80,10 @@ export default function CreateLinkPage() {
         throw new Error(errorData.details || errorData.error || 'Failed to create link');
       }
 
-      const { id } = await response.json();
-      router.push(`/link/${id}`);
+      const { id, slug } = await response.json();
+      // Use custom slug if available, otherwise use UUID
+      const linkIdentifier = slug || id;
+      router.push(`/link/${linkIdentifier}`);
     } catch (err) {
       console.error('Create link error:', err);
       setError(err instanceof Error ? err.message : 'Failed to create link');
@@ -91,6 +95,7 @@ export default function CreateLinkPage() {
   const isValidRecipient = recipient.length > 0 && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(recipient);
   const isUsingDefaultWallet = !isCustomRecipient && user?.wallet;
   const isValidAmount = amount.length > 0 && parseFloat(amount) > 0;
+  const isValidSlug = !customSlug || /^[a-zA-Z0-9_-]{3,50}$/.test(customSlug);
 
   if (userLoading) {
     return (
@@ -303,6 +308,41 @@ export default function CreateLinkPage() {
                   />
                 </div>
 
+                {/* Custom URL */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-lg flex items-center justify-center">
+                        <FaLink className="text-purple-300 text-sm" />
+                      </div>
+                      <span>Custom URL (Optional)</span>
+                    </div>
+                  </label>
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <span className="px-4 py-4 border border-white/30 border-r-0 rounded-l-xl bg-white/5 text-gray-300 font-medium text-sm">
+                        paylink.app/link/
+                      </span>
+                      <input
+                        type="text"
+                        value={customSlug}
+                        onChange={(e) => setCustomSlug(e.target.value)}
+                        placeholder="my-custom-link"
+                        className="flex-1 px-4 py-4 border border-white/30 rounded-r-xl focus:ring-2 focus:ring-purple-400 focus:border-purple-400 placeholder-gray-400 text-white bg-white/10 backdrop-blur-sm transition-all"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      Create a memorable URL like "paylink.app/link/my-custom-link". Leave empty for a random ID.
+                    </p>
+                    {customSlug && !isValidSlug && (
+                      <p className="mt-2 text-sm text-red-300 flex items-center">
+                        <FaExclamationTriangle className="mr-2 text-sm" />
+                        Custom URL must be 3-50 characters and contain only letters, numbers, hyphens, and underscores
+                      </p>
+                    )}
+                  </div>
+                </div>
+
                 {/* Error Message */}
                 {error && (
                   <div className="bg-red-500/20 border border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
@@ -316,7 +356,7 @@ export default function CreateLinkPage() {
                 {/* Submit Button */}
                 <button
                   onClick={handleCreateLink}
-                  disabled={(!isValidRecipient && !isUsingDefaultWallet) || !isValidAmount || loading}
+                  disabled={(!isValidRecipient && !isUsingDefaultWallet) || !isValidAmount || !isValidSlug || loading}
                   className="w-full px-6 py-4 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-xl hover:from-purple-500 hover:to-purple-600 transition-all font-medium text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-lg hover:shadow-xl backdrop-blur-sm"
                 >
                   {loading ? (

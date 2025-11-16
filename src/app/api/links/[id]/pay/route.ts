@@ -9,11 +9,11 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { transactionHash } = await request.json();
-    const linkId = params.id;
+    const { id } = await params;
 
     if (!transactionHash) {
       return NextResponse.json(
@@ -22,17 +22,24 @@ export async function POST(
       );
     }
 
+    // Determine if it's a UUID or slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    
     // Update the link status to 'paid' and add transaction details
-    const { data, error } = await supabase
-      .from('links')
-      .update({
-        status: 'paid',
-        transaction_hash: transactionHash,
-        paid_at: new Date().toISOString()
-      })
-      .eq('id', linkId)
-      .select()
-      .single();
+    // Use appropriate field based on whether it's UUID or slug
+    const updateQuery = isUUID 
+      ? supabase.from('links').update({
+          status: 'paid',
+          transaction_hash: transactionHash,
+          paid_at: new Date().toISOString()
+        }).eq('id', id)
+      : supabase.from('links').update({
+          status: 'paid',
+          transaction_hash: transactionHash,
+          paid_at: new Date().toISOString()
+        }).eq('slug', id.toLowerCase());
+
+    const { data, error } = await updateQuery.select().single();
 
     if (error) {
       console.error('Error updating link status:', error);

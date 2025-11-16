@@ -10,13 +10,44 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    console.log('Fetching link with ID:', id);
+    console.log('Fetching link with ID/slug:', id);
 
-    const { data, error } = await supabase
-      .from('links')
-      .select('*')
-      .eq('id', id)
-      .single();
+    // Try to find by slug first (if it's not a UUID format)
+    // UUID format: 8-4-4-4-12 hex characters
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+    
+    let data, error;
+    
+    if (isUUID) {
+      // Look up by UUID
+      const result = await supabase
+        .from('links')
+        .select('*')
+        .eq('id', id)
+        .single();
+      data = result.data;
+      error = result.error;
+    } else {
+      // Look up by slug
+      const result = await supabase
+        .from('links')
+        .select('*')
+        .eq('slug', id.toLowerCase())
+        .single();
+      data = result.data;
+      error = result.error;
+      
+      // If not found by slug, try UUID as fallback
+      if (error && error.code === 'PGRST116') {
+        const fallbackResult = await supabase
+          .from('links')
+          .select('*')
+          .eq('id', id)
+          .single();
+        data = fallbackResult.data;
+        error = fallbackResult.error;
+      }
+    }
 
     if (error) {
       console.error('Supabase error fetching link:', error);
@@ -28,7 +59,7 @@ export async function GET(
     }
 
     if (!data) {
-      console.error('No data found for link ID:', id);
+      console.error('No data found for link ID/slug:', id);
       return NextResponse.json(
         { error: 'Link not found' },
         { status: 404 }
@@ -39,6 +70,7 @@ export async function GET(
 
     return NextResponse.json({
       id: data.id,
+      slug: data.slug,
       username: data.username,
       recipient: data.recipient,
       amount: data.amount,

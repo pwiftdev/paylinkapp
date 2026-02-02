@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
+import { useWalletModal, WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 import Link from 'next/link';
 import Image from 'next/image';
 import { FaWallet, FaUser, FaArrowLeft, FaCheckCircle, FaSpinner } from 'react-icons/fa';
@@ -188,12 +188,17 @@ export default function RegisterPage() {
                   </p>
                 </div>
               </div>
-              <button
-                onClick={() => setVisible(true)}
-                className="px-4 py-2 bg-gradient-to-r from-purple-500/80 to-purple-600/80 text-white rounded-lg hover:from-purple-500 hover:to-purple-600 transition-all font-medium text-sm shadow-sm hover:shadow-md backdrop-blur-sm"
-              >
-                {publicKey ? 'Change' : 'Connect'}
-              </button>
+              <WalletMultiButton 
+                style={{
+                  background: 'linear-gradient(to right, rgba(147, 51, 234, 0.8), rgba(126, 34, 206, 0.8))',
+                  borderRadius: '0.5rem',
+                  fontSize: '0.875rem',
+                  fontWeight: '500',
+                  padding: '0.5rem 1rem',
+                  transition: 'all 0.3s',
+                  height: 'auto',
+                }}
+              />
             </div>
             
             {publicKey && (

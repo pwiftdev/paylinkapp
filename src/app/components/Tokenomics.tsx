@@ -5,7 +5,7 @@ import Aurora from '@/components/Aurora'
 import { useState, useEffect } from 'react'
 
 const Tokenomics = () => {
-  const [animatedPercentages, setAnimatedPercentages] = useState<number[]>([0, 0, 0, 0]);
+  const [animatedPercentages, setAnimatedPercentages] = useState<number[]>([0, 0]);
   
   const tokenomics = {
     supply: '1,000,000,000',
@@ -15,35 +15,19 @@ const Tokenomics = () => {
   const distribution = [
     { 
       label: 'Open Market on Pump.Fun', 
-      percentage: 70, 
+      percentage: 90, 
       color: 'from-purple-500 to-purple-600',
       bgColor: 'bg-purple-100',
       textColor: 'text-purple-700',
       icon: FaFire
     },
     { 
-      label: 'PayLink Utility (Locked)', 
-      percentage: 20, 
+      label: 'Locked for Pump.fun Hackathon', 
+      percentage: 10, 
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-100',
       textColor: 'text-green-700',
       icon: FaLock
-    },
-    { 
-      label: 'Marketing and Partnerships (Vested)', 
-      percentage: 7.5, 
-      color: 'from-blue-500 to-blue-600',
-      bgColor: 'bg-blue-100',
-      textColor: 'text-blue-700',
-      icon: FaUsers
-    },
-    { 
-      label: 'Development Team (Vested)', 
-      percentage: 2.5, 
-      color: 'from-amber-500 to-amber-600',
-      bgColor: 'bg-amber-100',
-      textColor: 'text-amber-700',
-      icon: FaRocket
     },
   ]
 
@@ -148,8 +132,6 @@ const Tokenomics = () => {
                   const colors = [
                     { bg: 'bg-purple-500', gradient: 'from-purple-500 to-purple-600', text: 'text-purple-300' },
                     { bg: 'bg-green-500', gradient: 'from-green-500 to-green-600', text: 'text-green-300' },
-                    { bg: 'bg-blue-500', gradient: 'from-blue-500 to-blue-600', text: 'text-blue-300' },
-                    { bg: 'bg-amber-500', gradient: 'from-amber-500 to-amber-600', text: 'text-amber-300' },
                   ];
                   const color = colors[index];
                   const animatedWidth = animatedPercentages[index] || 0;

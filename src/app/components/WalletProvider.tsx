@@ -15,11 +15,15 @@ require('@solana/wallet-adapter-react-ui/styles.css');
 
 export const CustomWalletProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const network = SOLANA_NETWORK as WalletAdapterNetwork;
+  
   const endpoint = useMemo(() => {
-    if (SOLANA_RPC_ENDPOINT && SOLANA_RPC_ENDPOINT.trim().length > 0) return SOLANA_RPC_ENDPOINT;
+    if (SOLANA_RPC_ENDPOINT && SOLANA_RPC_ENDPOINT.trim().length > 0) {
+      return SOLANA_RPC_ENDPOINT;
+    }
     return clusterApiUrl(network);
   }, [network]);
 
+  // Only Phantom and Solflare - the most common Solana wallets
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
@@ -30,7 +34,7 @@ export const CustomWalletProvider: FC<{ children: ReactNode }> = ({ children }) 
 
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false}>
         <WalletModalProvider>
           {children}
         </WalletModalProvider>

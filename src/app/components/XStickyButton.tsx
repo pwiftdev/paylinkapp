@@ -1,9 +1,17 @@
 "use client";
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaXTwitter } from "react-icons/fa6";
 
 export default function XStickyButton() {
+  const pathname = usePathname();
+  
+  // Hide on dashboard page
+  if (pathname === '/dashboard') {
+    return null;
+  }
+
   return (
     <div className="fixed left-4 bottom-4 z-50">
       <Link
@@ -20,6 +28,3 @@ export default function XStickyButton() {
     </div>
   );
 }
-
-
-

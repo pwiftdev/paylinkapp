@@ -1,37 +1,27 @@
 'use client';
 
-import { useWallet } from '@solana/wallet-adapter-react';
-import { useWalletModal } from '@solana/wallet-adapter-react-ui';
-import { FaWallet, FaSignOutAlt } from 'react-icons/fa';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 export default function ConnectWallet() {
-  const { wallet, disconnect, publicKey } = useWallet();
-  const { setVisible } = useWalletModal();
-
-  const handleClick = () => {
-    if (wallet) {
-      disconnect();
-    } else {
-      setVisible(true);
-    }
-  };
-
   return (
-    <button
-      onClick={handleClick}
-      className="w-full px-6 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white rounded-2xl hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 transition-all font-bold text-lg flex items-center justify-center gap-3 shadow-lg hover:shadow-xl transform hover:scale-[1.02] active:scale-[0.98]"
-    >
-      {wallet ? (
-        <>
-          <FaSignOutAlt className="text-xl" />
-          <span>Disconnect {wallet.adapter.name}</span>
-        </>
-      ) : (
-        <>
-          <FaWallet className="text-xl" />
-          <span>Connect Solana Wallet</span>
-        </>
-      )}
-    </button>
+    <div className="w-full flex justify-center">
+      <WalletMultiButton 
+        style={{
+          width: '100%',
+          background: 'linear-gradient(to right, rgb(147, 51, 234), rgb(219, 39, 119), rgb(99, 102, 241))',
+          borderRadius: '1rem',
+          fontSize: '1.25rem',
+          fontWeight: '700',
+          padding: '1.5rem 2rem',
+          transition: 'all 0.3s',
+          boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '0.75rem',
+          minHeight: '4rem',
+        }}
+      />
+    </div>
   );
 }

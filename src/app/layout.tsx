@@ -2,7 +2,6 @@ import "./globals.css";
 import { CustomWalletProvider } from './components/WalletProvider';
 import Image from 'next/image';
 import XStickyButton from './components/XStickyButton';
-import DashboardButton from './components/DashboardButton';
 
 export const metadata = {
   title: 'PayLink - Solana Payment Links',
@@ -38,7 +37,6 @@ export default function RootLayout({
           {children}
         </CustomWalletProvider>
         <XStickyButton />
-        <DashboardButton />
       </body>
     </html>
   );
